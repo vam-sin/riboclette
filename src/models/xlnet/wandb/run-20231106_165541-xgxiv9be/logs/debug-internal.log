@@ -1,0 +1,621 @@
+2023-11-06 16:55:41,587 INFO    StreamThr :92131 [internal.py:wandb_internal():86] W&B internal server running at pid: 92131, started at: 2023-11-06 16:55:41.585091
+2023-11-06 16:55:41,603 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status
+2023-11-06 16:55:41,606 INFO    WriterThread:92131 [datastore.py:open_for_write():85] open: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/run-xgxiv9be.wandb
+2023-11-06 16:55:41,612 DEBUG   SenderThread:92131 [sender.py:send():380] send: header
+2023-11-06 16:55:41,613 DEBUG   SenderThread:92131 [sender.py:send():380] send: run
+2023-11-06 16:55:42,148 INFO    SenderThread:92131 [dir_watcher.py:__init__():211] watching files in: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files
+2023-11-06 16:55:42,148 INFO    SenderThread:92131 [sender.py:_start_run_threads():1122] run started: xgxiv9be with start time 1699286141.589905
+2023-11-06 16:55:42,155 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: check_version
+2023-11-06 16:55:42,156 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: check_version
+2023-11-06 16:55:42,255 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: run_start
+2023-11-06 16:55:42,274 DEBUG   HandlerThread:92131 [system_info.py:__init__():32] System info init
+2023-11-06 16:55:42,274 DEBUG   HandlerThread:92131 [system_info.py:__init__():47] System info init done
+2023-11-06 16:55:42,275 INFO    HandlerThread:92131 [system_monitor.py:start():194] Starting system monitor
+2023-11-06 16:55:42,276 INFO    SystemMonitor:92131 [system_monitor.py:_start():158] Starting system asset monitoring threads
+2023-11-06 16:55:42,276 INFO    HandlerThread:92131 [system_monitor.py:probe():214] Collecting system info
+2023-11-06 16:55:42,277 INFO    SystemMonitor:92131 [interfaces.py:start():190] Started cpu monitoring
+2023-11-06 16:55:42,279 INFO    SystemMonitor:92131 [interfaces.py:start():190] Started disk monitoring
+2023-11-06 16:55:42,280 INFO    SystemMonitor:92131 [interfaces.py:start():190] Started gpu monitoring
+2023-11-06 16:55:42,282 INFO    SystemMonitor:92131 [interfaces.py:start():190] Started memory monitoring
+2023-11-06 16:55:42,283 INFO    SystemMonitor:92131 [interfaces.py:start():190] Started network monitoring
+2023-11-06 16:55:42,336 DEBUG   HandlerThread:92131 [system_info.py:probe():196] Probing system
+2023-11-06 16:55:42,343 DEBUG   HandlerThread:92131 [gitlib.py:_init_repo():53] git repository is invalid
+2023-11-06 16:55:42,343 DEBUG   HandlerThread:92131 [system_info.py:probe():244] Probing system done
+2023-11-06 16:55:42,344 DEBUG   HandlerThread:92131 [system_monitor.py:probe():223] {'os': 'Linux-5.4.0-153-generic-x86_64-with-glibc2.31', 'python': '3.9.12', 'heartbeatAt': '2023-11-06T15:55:42.336467', 'startedAt': '2023-11-06T15:55:41.525324', 'docker': None, 'cuda': None, 'args': (), 'state': 'running', 'program': '/nfs_home/nallapar/riboclette/src/models/xlnet/model_dh.py', 'codePathLocal': 'model_dh.py', 'codePath': 'model_dh.py', 'host': 'lts2gdk0', 'username': 'nallapar', 'executable': '/nfs_home/nallapar/rb-prof/bio_embeds/bin/python', 'cpu_count': 24, 'cpu_count_logical': 48, 'cpu_freq': {'current': 1339.4047500000004, 'min': 1200.0, 'max': 2900.0}, 'cpu_freq_per_core': [{'current': 2697.571, 'min': 1200.0, 'max': 2900.0}, {'current': 1613.211, 'min': 1200.0, 'max': 2900.0}, {'current': 1200.485, 'min': 1200.0, 'max': 2900.0}, {'current': 1202.878, 'min': 1200.0, 'max': 2900.0}, {'current': 1203.655, 'min': 1200.0, 'max': 2900.0}, {'current': 1200.182, 'min': 1200.0, 'max': 2900.0}, {'current': 1202.648, 'min': 1200.0, 'max': 2900.0}, {'current': 1203.228, 'min': 1200.0, 'max': 2900.0}, {'current': 1202.351, 'min': 1200.0, 'max': 2900.0}, {'current': 1202.706, 'min': 1200.0, 'max': 2900.0}, {'current': 1202.852, 'min': 1200.0, 'max': 2900.0}, {'current': 1202.832, 'min': 1200.0, 'max': 2900.0}, {'current': 1917.559, 'min': 1200.0, 'max': 2900.0}, {'current': 1201.609, 'min': 1200.0, 'max': 2900.0}, {'current': 1200.861, 'min': 1200.0, 'max': 2900.0}, {'current': 1204.146, 'min': 1200.0, 'max': 2900.0}, {'current': 1291.237, 'min': 1200.0, 'max': 2900.0}, {'current': 1200.63, 'min': 1200.0, 'max': 2900.0}, {'current': 1200.3, 'min': 1200.0, 'max': 2900.0}, {'current': 1200.616, 'min': 1200.0, 'max': 2900.0}, {'current': 1200.502, 'min': 1200.0, 'max': 2900.0}, {'current': 1200.459, 'min': 1200.0, 'max': 2900.0}, {'current': 1461.367, 'min': 1200.0, 'max': 2900.0}, {'current': 1203.697, 'min': 1200.0, 'max': 2900.0}, {'current': 2700.439, 'min': 1200.0, 'max': 2900.0}, {'current': 1600.822, 'min': 1200.0, 'max': 2900.0}, {'current': 1201.236, 'min': 1200.0, 'max': 2900.0}, {'current': 1201.032, 'min': 1200.0, 'max': 2900.0}, {'current': 1200.251, 'min': 1200.0, 'max': 2900.0}, {'current': 1201.539, 'min': 1200.0, 'max': 2900.0}, {'current': 1201.128, 'min': 1200.0, 'max': 2900.0}, {'current': 1201.344, 'min': 1200.0, 'max': 2900.0}, {'current': 1200.962, 'min': 1200.0, 'max': 2900.0}, {'current': 1201.15, 'min': 1200.0, 'max': 2900.0}, {'current': 1201.394, 'min': 1200.0, 'max': 2900.0}, {'current': 1200.824, 'min': 1200.0, 'max': 2900.0}, {'current': 2023.734, 'min': 1200.0, 'max': 2900.0}, {'current': 1200.18, 'min': 1200.0, 'max': 2900.0}, {'current': 1201.51, 'min': 1200.0, 'max': 2900.0}, {'current': 1200.504, 'min': 1200.0, 'max': 2900.0}, {'current': 1558.721, 'min': 1200.0, 'max': 2900.0}, {'current': 1200.2, 'min': 1200.0, 'max': 2900.0}, {'current': 1201.325, 'min': 1200.0, 'max': 2900.0}, {'current': 1201.92, 'min': 1200.0, 'max': 2900.0}, {'current': 1200.141, 'min': 1200.0, 'max': 2900.0}, {'current': 1200.193, 'min': 1200.0, 'max': 2900.0}, {'current': 1567.407, 'min': 1200.0, 'max': 2900.0}, {'current': 1200.483, 'min': 1200.0, 'max': 2900.0}], 'disk': {'/': {'total': 36.4654541015625, 'used': 17.994728088378906}}, 'gpu': 'NVIDIA GeForce GTX 1080 Ti', 'gpu_count': 1, 'gpu_devices': [{'name': 'NVIDIA GeForce GTX 1080 Ti', 'memory_total': 11721506816}], 'memory': {'total': 220.27867126464844}}
+2023-11-06 16:55:42,344 INFO    HandlerThread:92131 [system_monitor.py:probe():224] Finished collecting system info
+2023-11-06 16:55:42,345 INFO    HandlerThread:92131 [system_monitor.py:probe():227] Publishing system info
+2023-11-06 16:55:42,346 DEBUG   HandlerThread:92131 [system_info.py:_save_pip():52] Saving list of pip packages installed into the current environment
+2023-11-06 16:55:42,349 DEBUG   HandlerThread:92131 [system_info.py:_save_pip():68] Saving pip packages done
+2023-11-06 16:55:42,351 INFO    HandlerThread:92131 [system_monitor.py:probe():229] Finished publishing system info
+2023-11-06 16:55:42,382 DEBUG   SenderThread:92131 [sender.py:send():380] send: files
+2023-11-06 16:55:42,383 INFO    SenderThread:92131 [sender.py:_save_file():1378] saving file wandb-metadata.json with policy now
+2023-11-06 16:55:42,400 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: stop_status
+2023-11-06 16:55:42,400 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: stop_status
+2023-11-06 16:55:42,404 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: internal_messages
+2023-11-06 16:55:42,640 DEBUG   SenderThread:92131 [sender.py:send():380] send: telemetry
+2023-11-06 16:55:42,640 DEBUG   SenderThread:92131 [sender.py:send():380] send: config
+2023-11-06 16:55:42,642 DEBUG   SenderThread:92131 [sender.py:send():380] send: metric
+2023-11-06 16:55:42,642 DEBUG   SenderThread:92131 [sender.py:send():380] send: telemetry
+2023-11-06 16:55:42,642 DEBUG   SenderThread:92131 [sender.py:send():380] send: metric
+2023-11-06 16:55:42,642 WARNING SenderThread:92131 [sender.py:send_metric():1329] Seen metric with glob (shouldn't happen)
+2023-11-06 16:55:43,032 INFO    wandb-upload_0:92131 [upload_job.py:push():131] Uploaded file /tmp/tmpo105pn82wandb/k8d16mfr-wandb-metadata.json
+2023-11-06 16:55:43,151 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_created():271] file/dir created: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:55:43,151 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_created():271] file/dir created: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/requirements.txt
+2023-11-06 16:55:43,152 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_created():271] file/dir created: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/wandb-metadata.json
+2023-11-06 16:55:45,151 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:55:46,764 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:55:47,154 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:55:49,156 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:55:51,158 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:55:51,873 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:55:53,162 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:55:55,164 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:55:56,885 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:55:57,166 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:55:57,401 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: stop_status
+2023-11-06 16:55:57,401 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: stop_status
+2023-11-06 16:55:57,415 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: internal_messages
+2023-11-06 16:55:59,168 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:56:01,170 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:56:02,037 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:56:03,171 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:56:05,179 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:56:07,048 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:56:07,182 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:56:09,184 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:56:09,676 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: partial_history
+2023-11-06 16:56:09,681 DEBUG   SenderThread:92131 [sender.py:send():380] send: metric
+2023-11-06 16:56:09,681 DEBUG   SenderThread:92131 [sender.py:send():380] send: metric
+2023-11-06 16:56:09,682 DEBUG   SenderThread:92131 [sender.py:send():380] send: metric
+2023-11-06 16:56:09,684 DEBUG   SenderThread:92131 [sender.py:send():380] send: history
+2023-11-06 16:56:09,684 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: summary_record
+2023-11-06 16:56:09,687 INFO    SenderThread:92131 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-11-06 16:56:10,185 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_created():271] file/dir created: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/wandb-summary.json
+2023-11-06 16:56:11,186 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:56:12,126 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:56:12,187 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:56:12,410 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: stop_status
+2023-11-06 16:56:12,426 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: internal_messages
+2023-11-06 16:56:12,493 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: stop_status
+2023-11-06 16:56:13,193 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:56:13,193 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/config.yaml
+2023-11-06 16:56:15,200 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:56:17,197 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:56:17,522 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:56:19,199 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:56:21,201 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:56:22,625 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:56:23,203 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:56:25,205 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:56:27,207 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:56:27,401 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: stop_status
+2023-11-06 16:56:27,402 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: stop_status
+2023-11-06 16:56:27,411 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: internal_messages
+2023-11-06 16:56:27,686 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:56:29,209 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:56:31,212 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:56:32,910 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:56:33,213 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:56:35,216 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:56:36,813 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: partial_history
+2023-11-06 16:56:36,820 DEBUG   SenderThread:92131 [sender.py:send():380] send: history
+2023-11-06 16:56:36,821 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: summary_record
+2023-11-06 16:56:36,826 INFO    SenderThread:92131 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-11-06 16:56:37,219 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:56:37,220 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/wandb-summary.json
+2023-11-06 16:56:37,988 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:56:38,220 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:56:39,221 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:56:41,223 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:56:42,287 DEBUG   SystemMonitor:92131 [system_monitor.py:_start():172] Starting system metrics aggregation loop
+2023-11-06 16:56:42,291 DEBUG   SenderThread:92131 [sender.py:send():380] send: stats
+2023-11-06 16:56:42,403 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: stop_status
+2023-11-06 16:56:42,404 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: stop_status
+2023-11-06 16:56:42,444 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: internal_messages
+2023-11-06 16:56:43,039 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:56:43,225 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:56:45,227 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:56:47,229 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:56:48,253 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:56:49,231 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:56:51,233 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:56:53,237 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:56:53,406 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:56:55,238 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:56:57,240 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:56:57,404 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: stop_status
+2023-11-06 16:56:57,405 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: stop_status
+2023-11-06 16:56:57,414 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: internal_messages
+2023-11-06 16:56:58,464 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:56:59,242 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:57:01,213 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: partial_history
+2023-11-06 16:57:01,215 DEBUG   SenderThread:92131 [sender.py:send():380] send: history
+2023-11-06 16:57:01,216 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: summary_record
+2023-11-06 16:57:01,220 INFO    SenderThread:92131 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-11-06 16:57:01,248 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:57:01,248 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/wandb-summary.json
+2023-11-06 16:57:02,249 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:57:03,250 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:57:03,529 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:57:05,252 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:57:07,254 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:57:08,560 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:57:09,256 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:57:11,258 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:57:12,296 DEBUG   SenderThread:92131 [sender.py:send():380] send: stats
+2023-11-06 16:57:12,404 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: stop_status
+2023-11-06 16:57:12,404 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: stop_status
+2023-11-06 16:57:12,417 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: internal_messages
+2023-11-06 16:57:13,261 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:57:13,658 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:57:15,263 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:57:17,265 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:57:18,786 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:57:19,267 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:57:21,273 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:57:23,280 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:57:23,717 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: partial_history
+2023-11-06 16:57:23,722 DEBUG   SenderThread:92131 [sender.py:send():380] send: history
+2023-11-06 16:57:23,722 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: summary_record
+2023-11-06 16:57:23,725 INFO    SenderThread:92131 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-11-06 16:57:23,801 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:57:24,281 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/wandb-summary.json
+2023-11-06 16:57:25,284 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:57:26,283 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:57:27,284 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:57:27,404 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: stop_status
+2023-11-06 16:57:27,404 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: stop_status
+2023-11-06 16:57:27,444 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: internal_messages
+2023-11-06 16:57:28,933 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:57:29,286 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:57:31,288 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:57:33,289 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:57:33,942 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:57:35,291 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:57:37,293 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:57:38,979 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:57:39,295 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:57:41,297 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:57:42,299 DEBUG   SenderThread:92131 [sender.py:send():380] send: stats
+2023-11-06 16:57:42,404 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: stop_status
+2023-11-06 16:57:42,405 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: stop_status
+2023-11-06 16:57:42,417 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: internal_messages
+2023-11-06 16:57:43,302 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:57:44,039 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:57:45,305 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:57:47,306 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:57:49,125 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:57:49,308 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:57:50,347 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: partial_history
+2023-11-06 16:57:50,350 DEBUG   SenderThread:92131 [sender.py:send():380] send: history
+2023-11-06 16:57:50,351 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: summary_record
+2023-11-06 16:57:50,354 INFO    SenderThread:92131 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-11-06 16:57:51,310 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:57:51,310 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/wandb-summary.json
+2023-11-06 16:57:52,316 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:57:53,317 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:57:54,199 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:57:55,318 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:57:57,320 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:57:57,404 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: stop_status
+2023-11-06 16:57:57,405 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: stop_status
+2023-11-06 16:57:57,417 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: internal_messages
+2023-11-06 16:57:59,211 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:57:59,326 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:58:01,328 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:58:03,330 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:58:04,377 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:58:05,337 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:58:07,334 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:58:09,336 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:58:09,438 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:58:11,338 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:58:12,301 DEBUG   SenderThread:92131 [sender.py:send():380] send: stats
+2023-11-06 16:58:12,404 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: stop_status
+2023-11-06 16:58:12,405 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: stop_status
+2023-11-06 16:58:12,417 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: internal_messages
+2023-11-06 16:58:13,339 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:58:14,450 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:58:15,341 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:58:16,703 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: partial_history
+2023-11-06 16:58:16,706 DEBUG   SenderThread:92131 [sender.py:send():380] send: history
+2023-11-06 16:58:16,706 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: summary_record
+2023-11-06 16:58:16,711 INFO    SenderThread:92131 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-11-06 16:58:17,343 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:58:17,344 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/wandb-summary.json
+2023-11-06 16:58:18,344 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:58:19,345 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:58:19,665 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:58:21,350 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:58:23,362 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:58:24,732 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:58:25,370 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:58:27,375 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:58:27,405 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: stop_status
+2023-11-06 16:58:27,406 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: stop_status
+2023-11-06 16:58:27,421 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: internal_messages
+2023-11-06 16:58:29,377 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:58:29,877 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:58:31,388 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:58:33,381 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:58:34,926 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:58:35,383 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:58:37,385 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:58:39,387 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:58:40,083 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:58:41,389 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:58:42,305 DEBUG   SenderThread:92131 [sender.py:send():380] send: stats
+2023-11-06 16:58:42,405 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: stop_status
+2023-11-06 16:58:42,405 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: stop_status
+2023-11-06 16:58:42,418 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: internal_messages
+2023-11-06 16:58:43,391 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:58:44,704 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: partial_history
+2023-11-06 16:58:44,706 DEBUG   SenderThread:92131 [sender.py:send():380] send: history
+2023-11-06 16:58:44,717 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: summary_record
+2023-11-06 16:58:44,722 INFO    SenderThread:92131 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-11-06 16:58:45,093 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:58:45,393 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:58:45,393 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/wandb-summary.json
+2023-11-06 16:58:46,394 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:58:47,395 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:58:49,397 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:58:50,111 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:58:51,398 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:58:53,400 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:58:55,276 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:58:55,407 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:58:57,405 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: stop_status
+2023-11-06 16:58:57,406 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:58:57,406 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: stop_status
+2023-11-06 16:58:57,418 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: internal_messages
+2023-11-06 16:58:59,408 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:59:00,396 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:59:01,410 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:59:03,412 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:59:05,394 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:59:05,414 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:59:07,422 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:59:09,424 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:59:10,495 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:59:10,588 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: partial_history
+2023-11-06 16:59:10,590 DEBUG   SenderThread:92131 [sender.py:send():380] send: history
+2023-11-06 16:59:10,591 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: summary_record
+2023-11-06 16:59:10,598 INFO    SenderThread:92131 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-11-06 16:59:11,426 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:59:11,426 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/wandb-summary.json
+2023-11-06 16:59:12,311 DEBUG   SenderThread:92131 [sender.py:send():380] send: stats
+2023-11-06 16:59:12,405 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: stop_status
+2023-11-06 16:59:12,406 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: stop_status
+2023-11-06 16:59:12,420 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: internal_messages
+2023-11-06 16:59:12,427 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:59:13,428 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:59:15,430 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:59:15,556 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:59:17,432 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:59:19,434 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:59:20,667 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:59:21,437 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:59:23,441 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:59:25,444 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:59:25,699 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:59:27,405 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: stop_status
+2023-11-06 16:59:27,406 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: stop_status
+2023-11-06 16:59:27,448 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:59:27,449 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: internal_messages
+2023-11-06 16:59:29,450 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:59:30,777 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:59:31,455 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:59:33,455 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:59:35,464 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:59:36,078 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:59:37,080 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: partial_history
+2023-11-06 16:59:37,088 DEBUG   SenderThread:92131 [sender.py:send():380] send: history
+2023-11-06 16:59:37,089 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: summary_record
+2023-11-06 16:59:37,092 INFO    SenderThread:92131 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-11-06 16:59:37,460 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:59:37,461 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/wandb-summary.json
+2023-11-06 16:59:38,461 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:59:39,462 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:59:41,214 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:59:41,464 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:59:42,310 DEBUG   SenderThread:92131 [sender.py:send():380] send: stats
+2023-11-06 16:59:42,406 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: stop_status
+2023-11-06 16:59:42,406 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: stop_status
+2023-11-06 16:59:42,418 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: internal_messages
+2023-11-06 16:59:43,466 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:59:45,469 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:59:46,243 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:59:47,471 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:59:49,473 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:59:51,271 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:59:51,475 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:59:53,478 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:59:55,480 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:59:56,306 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 16:59:57,406 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: stop_status
+2023-11-06 16:59:57,407 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: stop_status
+2023-11-06 16:59:57,419 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: internal_messages
+2023-11-06 16:59:57,481 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 16:59:59,490 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:00:01,440 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 17:00:01,492 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:00:03,341 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: partial_history
+2023-11-06 17:00:03,343 DEBUG   SenderThread:92131 [sender.py:send():380] send: history
+2023-11-06 17:00:03,344 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: summary_record
+2023-11-06 17:00:03,352 INFO    SenderThread:92131 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-11-06 17:00:03,494 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:00:03,495 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/wandb-summary.json
+2023-11-06 17:00:04,495 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:00:05,498 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:00:06,504 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 17:00:07,500 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:00:09,503 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:00:11,505 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:00:11,528 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 17:00:12,315 DEBUG   SenderThread:92131 [sender.py:send():380] send: stats
+2023-11-06 17:00:12,406 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: stop_status
+2023-11-06 17:00:12,406 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: stop_status
+2023-11-06 17:00:12,448 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: internal_messages
+2023-11-06 17:00:13,508 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:00:15,510 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:00:16,614 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 17:00:17,512 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:00:19,515 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:00:21,517 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:00:21,682 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 17:00:23,520 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:00:25,523 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:00:26,992 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 17:00:27,406 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: stop_status
+2023-11-06 17:00:27,407 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: stop_status
+2023-11-06 17:00:27,419 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: internal_messages
+2023-11-06 17:00:27,525 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:00:29,527 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:00:30,803 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: partial_history
+2023-11-06 17:00:30,805 DEBUG   SenderThread:92131 [sender.py:send():380] send: history
+2023-11-06 17:00:30,805 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: summary_record
+2023-11-06 17:00:30,809 INFO    SenderThread:92131 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-11-06 17:00:31,529 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:00:31,530 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/wandb-summary.json
+2023-11-06 17:00:32,024 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 17:00:32,531 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:00:33,532 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:00:35,534 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:00:37,117 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 17:00:37,536 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:00:39,538 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:00:41,540 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:00:42,316 DEBUG   SenderThread:92131 [sender.py:send():380] send: stats
+2023-11-06 17:00:42,317 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 17:00:42,406 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: stop_status
+2023-11-06 17:00:42,407 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: stop_status
+2023-11-06 17:00:42,423 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: internal_messages
+2023-11-06 17:00:43,542 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:00:45,544 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:00:47,321 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 17:00:47,545 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:00:49,548 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:00:51,550 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:00:52,511 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 17:00:53,552 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:00:55,554 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:00:57,406 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: stop_status
+2023-11-06 17:00:57,407 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: stop_status
+2023-11-06 17:00:57,449 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: internal_messages
+2023-11-06 17:00:57,556 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:00:57,629 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 17:00:57,853 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: partial_history
+2023-11-06 17:00:57,857 DEBUG   SenderThread:92131 [sender.py:send():380] send: history
+2023-11-06 17:00:57,858 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: summary_record
+2023-11-06 17:00:57,860 INFO    SenderThread:92131 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-11-06 17:00:58,557 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/wandb-summary.json
+2023-11-06 17:00:59,561 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:01:00,562 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:01:01,568 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:01:02,661 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 17:01:03,575 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:01:05,579 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:01:07,586 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:01:07,669 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 17:01:10,593 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:01:11,601 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:01:12,318 DEBUG   SenderThread:92131 [sender.py:send():380] send: stats
+2023-11-06 17:01:12,407 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: stop_status
+2023-11-06 17:01:12,407 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: stop_status
+2023-11-06 17:01:12,423 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: internal_messages
+2023-11-06 17:01:12,697 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 17:01:13,602 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:01:15,608 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:01:17,613 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:01:17,845 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 17:01:20,615 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:01:22,619 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:01:22,913 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 17:01:24,621 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:01:26,623 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:01:27,410 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: stop_status
+2023-11-06 17:01:27,410 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: stop_status
+2023-11-06 17:01:27,423 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: internal_messages
+2023-11-06 17:01:28,052 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 17:01:28,628 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:01:30,630 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:01:32,633 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:01:33,152 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 17:01:34,635 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:01:36,642 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:01:38,173 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 17:01:38,644 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:01:40,646 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:01:42,320 DEBUG   SenderThread:92131 [sender.py:send():380] send: stats
+2023-11-06 17:01:42,408 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: stop_status
+2023-11-06 17:01:42,409 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: stop_status
+2023-11-06 17:01:42,449 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: internal_messages
+2023-11-06 17:01:42,648 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:01:43,329 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 17:01:44,650 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:01:46,652 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:01:48,457 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 17:01:48,654 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:01:50,656 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:01:52,657 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:01:53,541 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 17:01:54,659 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:01:56,661 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:01:57,408 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: stop_status
+2023-11-06 17:01:57,409 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: stop_status
+2023-11-06 17:01:57,423 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: internal_messages
+2023-11-06 17:01:58,656 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 17:01:58,657 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: partial_history
+2023-11-06 17:01:58,662 DEBUG   SenderThread:92131 [sender.py:send():380] send: metric
+2023-11-06 17:01:58,663 DEBUG   SenderThread:92131 [sender.py:send():380] send: metric
+2023-11-06 17:01:58,666 DEBUG   SenderThread:92131 [sender.py:send():380] send: metric
+2023-11-06 17:01:58,666 DEBUG   SenderThread:92131 [sender.py:send():380] send: metric
+2023-11-06 17:01:58,666 DEBUG   SenderThread:92131 [sender.py:send():380] send: metric
+2023-11-06 17:01:58,667 DEBUG   SenderThread:92131 [sender.py:send():380] send: history
+2023-11-06 17:01:58,667 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: summary_record
+2023-11-06 17:01:58,664 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:01:58,670 INFO    SenderThread:92131 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-11-06 17:01:59,664 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/wandb-summary.json
+2023-11-06 17:02:00,665 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:02:02,667 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:02:03,743 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 17:02:04,583 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: partial_history
+2023-11-06 17:02:04,584 DEBUG   SenderThread:92131 [sender.py:send():380] send: history
+2023-11-06 17:02:04,585 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: summary_record
+2023-11-06 17:02:04,589 INFO    SenderThread:92131 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-11-06 17:02:04,670 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:02:04,671 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/wandb-summary.json
+2023-11-06 17:02:06,086 DEBUG   SenderThread:92131 [sender.py:send():380] send: exit
+2023-11-06 17:02:06,086 INFO    SenderThread:92131 [sender.py:send_exit():585] handling exit code: 255
+2023-11-06 17:02:06,087 INFO    SenderThread:92131 [sender.py:send_exit():587] handling runtime: 383
+2023-11-06 17:02:06,089 INFO    SenderThread:92131 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-11-06 17:02:06,090 INFO    SenderThread:92131 [sender.py:send_exit():593] send defer
+2023-11-06 17:02:06,090 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: defer
+2023-11-06 17:02:06,091 INFO    HandlerThread:92131 [handler.py:handle_request_defer():172] handle defer: 0
+2023-11-06 17:02:06,091 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: defer
+2023-11-06 17:02:06,092 INFO    SenderThread:92131 [sender.py:send_request_defer():609] handle sender defer: 0
+2023-11-06 17:02:06,092 INFO    SenderThread:92131 [sender.py:transition_state():613] send defer: 1
+2023-11-06 17:02:06,093 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: defer
+2023-11-06 17:02:06,093 INFO    HandlerThread:92131 [handler.py:handle_request_defer():172] handle defer: 1
+2023-11-06 17:02:06,094 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: defer
+2023-11-06 17:02:06,094 INFO    SenderThread:92131 [sender.py:send_request_defer():609] handle sender defer: 1
+2023-11-06 17:02:06,100 INFO    SenderThread:92131 [sender.py:transition_state():613] send defer: 2
+2023-11-06 17:02:06,103 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: defer
+2023-11-06 17:02:06,103 INFO    HandlerThread:92131 [handler.py:handle_request_defer():172] handle defer: 2
+2023-11-06 17:02:06,103 INFO    HandlerThread:92131 [system_monitor.py:finish():203] Stopping system monitor
+2023-11-06 17:02:06,105 DEBUG   SystemMonitor:92131 [system_monitor.py:_start():179] Finished system metrics aggregation loop
+2023-11-06 17:02:06,105 DEBUG   SystemMonitor:92131 [system_monitor.py:_start():183] Publishing last batch of metrics
+2023-11-06 17:02:06,105 INFO    HandlerThread:92131 [interfaces.py:finish():202] Joined cpu monitor
+2023-11-06 17:02:06,108 INFO    HandlerThread:92131 [interfaces.py:finish():202] Joined disk monitor
+2023-11-06 17:02:06,209 INFO    HandlerThread:92131 [interfaces.py:finish():202] Joined gpu monitor
+2023-11-06 17:02:06,209 INFO    HandlerThread:92131 [interfaces.py:finish():202] Joined memory monitor
+2023-11-06 17:02:06,210 INFO    HandlerThread:92131 [interfaces.py:finish():202] Joined network monitor
+2023-11-06 17:02:06,211 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: defer
+2023-11-06 17:02:06,211 INFO    SenderThread:92131 [sender.py:send_request_defer():609] handle sender defer: 2
+2023-11-06 17:02:06,212 INFO    SenderThread:92131 [sender.py:transition_state():613] send defer: 3
+2023-11-06 17:02:06,212 DEBUG   SenderThread:92131 [sender.py:send():380] send: stats
+2023-11-06 17:02:06,212 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: defer
+2023-11-06 17:02:06,214 INFO    HandlerThread:92131 [handler.py:handle_request_defer():172] handle defer: 3
+2023-11-06 17:02:06,214 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: defer
+2023-11-06 17:02:06,215 INFO    SenderThread:92131 [sender.py:send_request_defer():609] handle sender defer: 3
+2023-11-06 17:02:06,215 INFO    SenderThread:92131 [sender.py:transition_state():613] send defer: 4
+2023-11-06 17:02:06,216 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: defer
+2023-11-06 17:02:06,216 INFO    HandlerThread:92131 [handler.py:handle_request_defer():172] handle defer: 4
+2023-11-06 17:02:06,217 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: defer
+2023-11-06 17:02:06,218 INFO    SenderThread:92131 [sender.py:send_request_defer():609] handle sender defer: 4
+2023-11-06 17:02:06,218 INFO    SenderThread:92131 [sender.py:transition_state():613] send defer: 5
+2023-11-06 17:02:06,219 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: defer
+2023-11-06 17:02:06,219 INFO    HandlerThread:92131 [handler.py:handle_request_defer():172] handle defer: 5
+2023-11-06 17:02:06,221 DEBUG   SenderThread:92131 [sender.py:send():380] send: summary
+2023-11-06 17:02:06,222 INFO    SenderThread:92131 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-11-06 17:02:06,223 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: defer
+2023-11-06 17:02:06,223 INFO    SenderThread:92131 [sender.py:send_request_defer():609] handle sender defer: 5
+2023-11-06 17:02:06,224 INFO    SenderThread:92131 [sender.py:transition_state():613] send defer: 6
+2023-11-06 17:02:06,224 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: defer
+2023-11-06 17:02:06,225 INFO    HandlerThread:92131 [handler.py:handle_request_defer():172] handle defer: 6
+2023-11-06 17:02:06,226 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: defer
+2023-11-06 17:02:06,226 INFO    SenderThread:92131 [sender.py:send_request_defer():609] handle sender defer: 6
+2023-11-06 17:02:06,232 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: status_report
+2023-11-06 17:02:06,496 INFO    SenderThread:92131 [sender.py:transition_state():613] send defer: 7
+2023-11-06 17:02:06,496 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: defer
+2023-11-06 17:02:06,496 INFO    HandlerThread:92131 [handler.py:handle_request_defer():172] handle defer: 7
+2023-11-06 17:02:06,497 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: defer
+2023-11-06 17:02:06,498 INFO    SenderThread:92131 [sender.py:send_request_defer():609] handle sender defer: 7
+2023-11-06 17:02:06,676 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:02:06,677 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/config.yaml
+2023-11-06 17:02:06,678 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/wandb-summary.json
+2023-11-06 17:02:07,087 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: poll_exit
+2023-11-06 17:02:08,090 INFO    SenderThread:92131 [sender.py:transition_state():613] send defer: 8
+2023-11-06 17:02:08,090 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: poll_exit
+2023-11-06 17:02:08,091 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: defer
+2023-11-06 17:02:08,092 INFO    HandlerThread:92131 [handler.py:handle_request_defer():172] handle defer: 8
+2023-11-06 17:02:08,093 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: defer
+2023-11-06 17:02:08,093 INFO    SenderThread:92131 [sender.py:send_request_defer():609] handle sender defer: 8
+2023-11-06 17:02:08,094 INFO    SenderThread:92131 [job_builder.py:build():281] Attempting to build job artifact
+2023-11-06 17:02:08,097 INFO    SenderThread:92131 [job_builder.py:_get_source_type():404] no source found
+2023-11-06 17:02:08,097 INFO    SenderThread:92131 [sender.py:transition_state():613] send defer: 9
+2023-11-06 17:02:08,098 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: defer
+2023-11-06 17:02:08,099 INFO    HandlerThread:92131 [handler.py:handle_request_defer():172] handle defer: 9
+2023-11-06 17:02:08,099 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: defer
+2023-11-06 17:02:08,100 INFO    SenderThread:92131 [sender.py:send_request_defer():609] handle sender defer: 9
+2023-11-06 17:02:08,100 INFO    SenderThread:92131 [dir_watcher.py:finish():358] shutting down directory watcher
+2023-11-06 17:02:08,681 INFO    Thread-12 :92131 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:02:08,683 INFO    SenderThread:92131 [dir_watcher.py:finish():388] scan: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files
+2023-11-06 17:02:08,684 INFO    SenderThread:92131 [dir_watcher.py:finish():402] scan save: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/config.yaml config.yaml
+2023-11-06 17:02:08,685 INFO    SenderThread:92131 [dir_watcher.py:finish():402] scan save: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/requirements.txt requirements.txt
+2023-11-06 17:02:08,689 INFO    SenderThread:92131 [dir_watcher.py:finish():402] scan save: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/wandb-metadata.json wandb-metadata.json
+2023-11-06 17:02:08,692 INFO    SenderThread:92131 [dir_watcher.py:finish():402] scan save: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log output.log
+2023-11-06 17:02:08,693 INFO    SenderThread:92131 [dir_watcher.py:finish():402] scan save: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/wandb-summary.json wandb-summary.json
+2023-11-06 17:02:08,694 INFO    SenderThread:92131 [sender.py:transition_state():613] send defer: 10
+2023-11-06 17:02:08,699 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: defer
+2023-11-06 17:02:08,699 INFO    HandlerThread:92131 [handler.py:handle_request_defer():172] handle defer: 10
+2023-11-06 17:02:08,705 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: defer
+2023-11-06 17:02:08,706 INFO    SenderThread:92131 [sender.py:send_request_defer():609] handle sender defer: 10
+2023-11-06 17:02:08,715 INFO    SenderThread:92131 [file_pusher.py:finish():175] shutting down file pusher
+2023-11-06 17:02:09,159 INFO    wandb-upload_1:92131 [upload_job.py:push():131] Uploaded file /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/requirements.txt
+2023-11-06 17:02:09,206 INFO    wandb-upload_3:92131 [upload_job.py:push():131] Uploaded file /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/wandb-summary.json
+2023-11-06 17:02:09,213 INFO    wandb-upload_0:92131 [upload_job.py:push():131] Uploaded file /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/config.yaml
+2023-11-06 17:02:09,302 INFO    wandb-upload_2:92131 [upload_job.py:push():131] Uploaded file /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/files/output.log
+2023-11-06 17:02:09,503 INFO    Thread-11 :92131 [sender.py:transition_state():613] send defer: 11
+2023-11-06 17:02:09,504 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: defer
+2023-11-06 17:02:09,504 INFO    HandlerThread:92131 [handler.py:handle_request_defer():172] handle defer: 11
+2023-11-06 17:02:09,506 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: defer
+2023-11-06 17:02:09,507 INFO    SenderThread:92131 [sender.py:send_request_defer():609] handle sender defer: 11
+2023-11-06 17:02:09,508 INFO    SenderThread:92131 [file_pusher.py:join():181] waiting for file pusher
+2023-11-06 17:02:09,509 INFO    SenderThread:92131 [sender.py:transition_state():613] send defer: 12
+2023-11-06 17:02:09,510 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: defer
+2023-11-06 17:02:09,511 INFO    HandlerThread:92131 [handler.py:handle_request_defer():172] handle defer: 12
+2023-11-06 17:02:09,513 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: defer
+2023-11-06 17:02:09,513 INFO    SenderThread:92131 [sender.py:send_request_defer():609] handle sender defer: 12
+2023-11-06 17:02:09,514 INFO    SenderThread:92131 [file_stream.py:finish():595] file stream finish called
+2023-11-06 17:02:10,053 INFO    SenderThread:92131 [file_stream.py:finish():599] file stream finish is done
+2023-11-06 17:02:10,054 INFO    SenderThread:92131 [sender.py:transition_state():613] send defer: 13
+2023-11-06 17:02:10,054 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: defer
+2023-11-06 17:02:10,055 INFO    HandlerThread:92131 [handler.py:handle_request_defer():172] handle defer: 13
+2023-11-06 17:02:10,055 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: defer
+2023-11-06 17:02:10,055 INFO    SenderThread:92131 [sender.py:send_request_defer():609] handle sender defer: 13
+2023-11-06 17:02:10,056 INFO    SenderThread:92131 [sender.py:transition_state():613] send defer: 14
+2023-11-06 17:02:10,056 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: defer
+2023-11-06 17:02:10,057 DEBUG   SenderThread:92131 [sender.py:send():380] send: final
+2023-11-06 17:02:10,057 INFO    HandlerThread:92131 [handler.py:handle_request_defer():172] handle defer: 14
+2023-11-06 17:02:10,057 DEBUG   SenderThread:92131 [sender.py:send():380] send: footer
+2023-11-06 17:02:10,059 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: defer
+2023-11-06 17:02:10,059 INFO    SenderThread:92131 [sender.py:send_request_defer():609] handle sender defer: 14
+2023-11-06 17:02:10,062 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: poll_exit
+2023-11-06 17:02:10,062 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: server_info
+2023-11-06 17:02:10,062 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: get_summary
+2023-11-06 17:02:10,063 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: poll_exit
+2023-11-06 17:02:10,064 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: server_info
+2023-11-06 17:02:10,063 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: sampled_history
+2023-11-06 17:02:10,070 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: internal_messages
+2023-11-06 17:02:10,070 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: job_info
+2023-11-06 17:02:10,275 DEBUG   SenderThread:92131 [sender.py:send_request():407] send_request: job_info
+2023-11-06 17:02:10,276 INFO    MainThread:92131 [wandb_run.py:_footer_history_summary_info():3599] rendering history
+2023-11-06 17:02:10,277 INFO    MainThread:92131 [wandb_run.py:_footer_history_summary_info():3631] rendering summary
+2023-11-06 17:02:10,277 INFO    MainThread:92131 [wandb_run.py:_footer_sync_info():3558] logging synced files
+2023-11-06 17:02:10,278 DEBUG   HandlerThread:92131 [handler.py:handle_request():146] handle_request: shutdown
+2023-11-06 17:02:10,278 INFO    HandlerThread:92131 [handler.py:finish():866] shutting down handler
+2023-11-06 17:02:11,071 INFO    WriterThread:92131 [datastore.py:close():294] close: /nfs_home/nallapar/riboclette/src/models/xlnet/wandb/run-20231106_165541-xgxiv9be/run-xgxiv9be.wandb
+2023-11-06 17:02:11,276 INFO    SenderThread:92131 [sender.py:finish():1534] shutting down sender
+2023-11-06 17:02:11,276 INFO    SenderThread:92131 [file_pusher.py:finish():175] shutting down file pusher
+2023-11-06 17:02:11,276 INFO    SenderThread:92131 [file_pusher.py:join():181] waiting for file pusher

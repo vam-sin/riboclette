@@ -1,0 +1,5 @@
+/models/xlnet/__pycache__ 
+/models/xlnet/data
+/models/xlnet/saved_models 
+/models/xlnet/wandb 
+/models/xlnet/run_xlnet.sh
