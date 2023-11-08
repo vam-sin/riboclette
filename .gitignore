@@ -2,4 +2,7 @@ src/models/xlnet/__pycache__
 src/models/xlnet/data
 src/models/xlnet/saved_models 
 src/models/xlnet/wandb 
-src/models/xlnet/run_xlnet.sh
+src/models/xlnet/preds
+src/models/xlnet/run_xlnet_sh.sh
+src/models/xlnet/run_xlnet_dh.sh 
+src/models/xlnet/slurm-*.out

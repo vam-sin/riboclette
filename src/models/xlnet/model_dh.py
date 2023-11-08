@@ -12,6 +12,7 @@ import random
 from torch.nn.utils.rnn import pad_sequence
 from torchmetrics.functional import pearson_corrcoef
 from torchmetrics import Metric
+from prediction_utils import analyse_dh_outputs, quantile_metric
 
 # reproducibility
 random.seed(42)
@@ -32,7 +33,7 @@ dropout_val = 0.3
 lr_val = 1e-4
 batch_size_val = 1
 
-model_name = 'XLNetDepr-' + str(n_layers_val) + '_' + str(d_model_val) + '_' + str(n_heads_val) + '-ALL_NA-PEL-BS' + str(batch_size_val) + '-GWS_PCC_IT192_DH_3L_NZ' + str(longZerosThresh_val) + '_PNTh' + str(percNansThresh_val) + '_AnnotThresh' + str(annot_thresh)
+model_name = 'XLNetDepr-' + str(n_layers_val) + '_' + str(d_model_val) + '_' + str(n_heads_val) + '-ALL_NA-PEL-BS' + str(batch_size_val) + '-GWS_PCC_IT192_DH_3LALPHA50_NZ' + str(longZerosThresh_val) + '_PNTh' + str(percNansThresh_val) + '_AnnotThresh' + str(annot_thresh)
 
 # GWS dataset
 ds = 'ALL' # this uses both liver and deprivation datasets all the conditions
@@ -46,9 +47,9 @@ print("samples in test dataset: ", len(test_dataset))
 
 # load xlnet to train from scratch
 # GWS
-config = XLNetConfig(vocab_size=385, pad_token_id=384, d_model = d_model_val, n_layer = n_layers_val, n_head = n_heads_val, d_inner = d_model_val, num_labels = 1, dropout=dropout_val) # 5^3 + 1 for padding
+config = XLNetConfig(vocab_size=193, pad_token_id=192, d_model = d_model_val, n_layer = n_layers_val, n_head = n_heads_val, d_inner = d_model_val, num_labels = 1, dropout=dropout_val) # 5^3 + 1 for padding
 model = XLNetForTokenClassification(config)
-# modify the input layer to take 384 to 256
+# modify the output layer
 model.classifier = torch.nn.Linear(d_model_val, 2, bias=True)
 
 class CorrCoef(Metric):
@@ -187,17 +188,22 @@ trainer.evaluate()
 # )
 
 # # load model best weights
-# model.load_state_dict(torch.load(output_loc + "/best_model/pytorch_model.bin"))
+# model.load_state_dict(torch.load(output_loc + "/checkpoint-925970/pytorch_model.bin"))
 
-# # trainer.evaluate()
+# trainer.evaluate()
 
 # # analyse preds
 # preds = np.load("preds/" + model_name + "/preds.npy")
 # labels = np.load("preds/" + model_name + "/labels.npy")
 # inputs = np.load("preds/" + model_name + "/inputs.npy")
 
-# # quantile_metric(preds, labels, inputs, "preds/" + model_name + "/analysis_dh/quantile_metric_plots/")
+# # # quantile_metric(preds, labels, inputs, "preds/" + model_name + "/analysis_dh/quantile_metric_plots/")
 
-# # analyse_dh_outputs(preds, labels, inputs, "preds/" + model_name + "/analysis_dh")
+# analyse_dh_outputs(preds, labels, inputs, "preds/" + model_name + "/analysis_dh", 'data/dh/ribo_test_ALL-NA_dh_' + str(annot_thresh) + '_NZ_' + str(longZerosThresh_val) + '_PercNan_' + str(percNansThresh_val) + '.csv')
 
-# captum_interpretability(model, inputs, labels)
+# # # captum_interpretability(model, inputs, labels)
+
+
+'''
+deprivation output head is 0 always or very close to 0
+'''

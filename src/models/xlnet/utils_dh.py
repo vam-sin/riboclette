@@ -49,11 +49,9 @@ def RiboDatasetGWS(data_folder: str, ds: str, threshold: float = 0.6, longZerosT
         # leu_path = data_folder + 'LEU.csv'
         # arg_path = data_folder + 'ARG.csv'
 
-        # # load the control data
+        # # load the data
         # df_ctrl = pd.read_csv(ctrl_path)
         # df_ctrl['condition'] = 'CTRL'
-
-        # # other dataset
         # df_leu = pd.read_csv(leu_path)
         # df_leu['condition'] = 'LEU'
         # df_arg = pd.read_csv(arg_path)
@@ -77,7 +75,7 @@ def RiboDatasetGWS(data_folder: str, ds: str, threshold: float = 0.6, longZerosT
 
         # for i in range(len(condition_df_list)):
         #     try:
-        #         if condition_df_list != 'CTRL':
+        #         if condition_df_list[i] != 'CTRL':
         #             # find the respective CTRL sequence for the transcript
         #             ctrl_sequence = df_full[(df_full['transcript'] == transcripts_list[i]) & (df_full['condition'] == 'CTRL')]['annotations'].iloc[0]
         #             sequences_ctrl.append(ctrl_sequence)
@@ -141,8 +139,8 @@ def RiboDatasetGWS(data_folder: str, ds: str, threshold: float = 0.6, longZerosT
         # df_train = df_full[df_full['gene'].isin(genes_train)]
         # df_test = df_full[df_full['gene'].isin(genes_test)]
 
-        out_train_path = 'data/ribo_train_ALL-NA_dh_' + str(threshold) + '_NZ_' + str(longZerosThresh) + '_PercNan_' + str(percNansThresh) + '.csv'
-        out_test_path = 'data/ribo_test_ALL-NA_dh_' + str(threshold) + '_NZ_' + str(longZerosThresh) + '_PercNan_' + str(percNansThresh) + '.csv'
+        out_train_path = 'data/dh/ribo_train_ALL-NA_dh_' + str(threshold) + '_NZ_' + str(longZerosThresh) + '_PercNan_' + str(percNansThresh) + '.csv'
+        out_test_path = 'data/dh/ribo_test_ALL-NA_dh_' + str(threshold) + '_NZ_' + str(longZerosThresh) + '_PercNan_' + str(percNansThresh) + '.csv'
 
         # df_train.to_csv(out_train_path, index=False)
         # df_test.to_csv(out_test_path, index=False)
@@ -151,13 +149,6 @@ def RiboDatasetGWS(data_folder: str, ds: str, threshold: float = 0.6, longZerosT
         df_test = pd.read_csv(out_test_path)
 
         return df_train, df_test
-
-def sequence_to_OH(codon_sequence):
-    oh_out = np.zeros((len(codon_sequence), 64))
-    for i in range(len(codon_sequence)):
-        oh_out[i][codon_sequence[i]] = 1
-
-    return oh_out
 
 class GWSDatasetFromPandas(Dataset):
     def __init__(self, df):
@@ -223,15 +214,6 @@ class MaskedPearsonLoss(nn.Module):
             y_true_mask - y_true_mask.mean(),
         )
 
-class MaskedPoissonLoss(nn.Module):
-    def __init__(self):
-        super().__init__()
-
-    def __call__(self, y_pred, y_true, mask):
-        y_pred_mask = torch.masked_select(y_pred, mask)
-        y_true_mask = torch.masked_select(y_true, mask)
-        return nn.functional.poisson_nll_loss(y_pred_mask, y_true_mask, log_input=False)
-
 class MaskedL1Loss(nn.Module):
     def __init__(self):
         super().__init__()
@@ -243,24 +225,12 @@ class MaskedL1Loss(nn.Module):
         loss = nn.functional.l1_loss(y_pred_mask, y_true_mask, reduction="none")
         return torch.sqrt(loss.mean())
 
-class MaskedCombinedPearsonLoss(nn.Module):
-    def __init__(self, comb_max_duration: int = 200):
-        super().__init__()
-        self.pearson = MaskedPearsonLoss()
-        self.poisson = MaskedPoissonLoss()
-        self.comb_max_duration = comb_max_duration
-
-    def __call__(self, y_pred, y_true, mask, timestamp, eps=1e-6):
-        poisson = self.poisson(y_pred, y_true, mask)
-        pearson = self.pearson(y_pred, y_true, mask, eps=eps)
-
-        return pearson + max(0, 1 - timestamp / self.comb_max_duration) * poisson
-
 class MaskedCombinedDoubleHeadPearsonLoss(nn.Module):
     def __init__(self):
         super().__init__()
         self.pearson = MaskedPearsonLoss()
         self.l1 = MaskedL1Loss()
+        self.alpha = 50
     
     def __call__(self, y_pred, labels, labels_ctrl, mask_full, mask_ctrl):
         y_pred_ctrl = y_pred[:, :, 0]
@@ -274,6 +244,25 @@ class MaskedCombinedDoubleHeadPearsonLoss(nn.Module):
         loss_depr_diff = self.l1(y_pred_depr_diff, labels_diff, mask_diff)
         loss_full = self.pearson(y_pred_full, labels, mask_full)
 
+        return loss_ctrl + (self.alpha*loss_depr_diff) + loss_full
+
+class MaskedCombinedDoubleHeadMAELoss(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.l1 = MaskedL1Loss()
+    
+    def __call__(self, y_pred, labels, labels_ctrl, mask_full, mask_ctrl):
+        y_pred_ctrl = y_pred[:, :, 0]
+        y_pred_depr_diff = y_pred[:, :, 1]
+        y_pred_full = torch.sum(y_pred, dim=2)
+        labels_diff = labels - labels_ctrl
+        # combine masks to make mask diff 
+        mask_diff = mask_full & mask_ctrl
+
+        loss_ctrl = self.l1(y_pred_ctrl, labels_ctrl, mask_ctrl)
+        loss_depr_diff = self.l1(y_pred_depr_diff, labels_diff, mask_diff)
+        loss_full = self.l1(y_pred_full, labels, mask_full)
+
         return loss_ctrl + loss_depr_diff + loss_full
 
 class RegressionTrainer(Trainer):
@@ -281,27 +270,21 @@ class RegressionTrainer(Trainer):
         # print(inputs)
         labels = inputs.pop("labels")
         labels_ctrl = inputs.pop("labels_ctrl")
-        # print("inputs: ", inputs)
         outputs = model(**inputs)
         logits = outputs.logits
         logits = torch.squeeze(logits, dim=2)
         lengths = inputs['lengths']
-        # loss_fnc = MaskedCombinedPearsonLoss()
 
         loss_fnc = MaskedCombinedDoubleHeadPearsonLoss()
+
+        # loss_fnc = MaskedCombinedDoubleHeadMAELoss()
         
         mask_full = torch.arange(labels.shape[1])[None, :].to(lengths) < lengths[:, None]
         mask_full = torch.logical_and(mask_full, torch.logical_not(torch.isnan(labels)))
 
         mask_ctrl = torch.arange(labels_ctrl.shape[1])[None, :].to(lengths) < lengths[:, None]
         mask_ctrl = torch.logical_and(mask_ctrl, torch.logical_not(torch.isnan(labels_ctrl)))
-
-        # print(logits, labels, labels_ctrl, mask)
-        # print("logits: ", logits)
-        # print("labels: ", labels)
-        # print("labels_ctrl: ", labels_ctrl)
         
         loss = loss_fnc(logits, labels, labels_ctrl, mask_full, mask_ctrl)
-        # print("loss: ", loss)
 
         return (loss, outputs) if return_outputs else loss 
