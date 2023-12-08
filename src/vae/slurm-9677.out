@@ -1,0 +1,4 @@
+Input Notebook:  vae_train.ipynb
+Output Notebook: model_outputs/vae.ipynb
+Executing:   0%|          | 0/5 [00:00<?, ?cell/s]Executing notebook with kernel: python3
+Executing:  20%|██        | 1/5 [00:21<01:24, 21.12s/cell]Executing:  60%|██████    | 3/5 [00:21<00:11,  5.77s/cell]
