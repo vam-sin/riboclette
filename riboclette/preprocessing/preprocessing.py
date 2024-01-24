@@ -282,9 +282,9 @@ def preprocess_raw_data(
     min_coverage: float = 0.5,
     discard_annot_one_replicate: bool = True,
 ):
-    # Normalize by mean
+    # Normalize by mean, grouping by gene and replicate
     df = df.assign(
-        counts=lambda df: df.groupby("gene", observed=True).counts.transform(
+        counts=lambda df: df.groupby(["gene", "fname"], observed=True).counts.transform(
             lambda x: x / np.mean(x)
         )
     )
