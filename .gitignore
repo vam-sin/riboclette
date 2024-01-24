@@ -1,14 +1,14 @@
-src/models/xlnet/__pycache__ 
-src/models/xlnet/data
-src/models/xlnet/model_outputs 
-src/models/xlnet/preds
-src/models/xlnet/saved_models 
-src/models/xlnet/wandb 
-src/models/xlnet/run_xlnet_sh.sh
-src/models/xlnet/run_xlnet_dh.sh 
-src/models/xlnet/run_plots.sh 
-src/models/xlnet/run_col1a1.sh 
-src/models/xlnet/slurm-*.out
+riboclette/models/xlnet/__pycache__ 
+riboclette/models/xlnet/data
+riboclette/models/xlnet/model_outputs 
+riboclette/models/xlnet/preds
+riboclette/models/xlnet/saved_models 
+riboclette/models/xlnet/wandb 
+riboclette/models/xlnet/run_xlnet_sh.sh
+riboclette/models/xlnet/run_xlnet_dh.sh 
+riboclette/models/xlnet/run_plots.sh 
+riboclette/models/xlnet/run_xlnet_conds_dh.sh 
+riboclette/models/xlnet/slurm-*.out
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
