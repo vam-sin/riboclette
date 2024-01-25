@@ -47,7 +47,7 @@ out_df = CapRInterface().get_categories(input_df)
 pip install git+https://github.com/DasLab/arnie
 ```
 ## 2. Install ViennaRNA 
-Follow **Quick Start** **User-dir Installation** in `https://github.com/ViennaRNA/ViennaRNA` in `/path/to/ViennaRNA`.
+Follow **Quick Start** and **User-dir Installation** in `https://github.com/ViennaRNA/ViennaRNA` and install into `/path/to/ViennaRNA`.
 
 ## 3. Run Interface
 ```python
