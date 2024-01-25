@@ -1,5 +1,6 @@
 # DataFrame from FASTA
 
+Make a dataframe from the FASTA file in `/path/to/FASTA`.
 ```python
 import pandas as pd
 from Bio import SeqIO
@@ -33,8 +34,7 @@ from riboclette.rna_sstruct.capr import CapRInterface
 os.system('echo "CAPR_PATH=path/to/CapR/CapR" >> .env')
 load_dotenv()
 
-# sequences_df is a DataFrame with a 
-# transcript and a sequence column
+# sequences_df is a DataFrame with a transcript and a sequence column
 input_df = sequences_df
 out_df = CapRInterface().get_categories(input_df)
 ```
@@ -63,14 +63,12 @@ load_dotenv()
 # Load after setting ARNIEFILE
 from riboclette.rna_sstruct.arnie import get_nucleotide_pairing_proba, get_maximum_expected_accuracy_seq
 
-# sequences_df is a DataFrame with 
-# a sequence column
+# sequences_df is a DataFrame with a sequence column
 input_df = sequences_df
 
 # Get pairing probability
 df_with_bpps = get_nucleotide_pairing_proba(input_df)
 
-# Get pairing probability and maximum
-# expected sequence
+# Get pairing probability and maximum expected sequence
 df_with_struct = get_maximum_expected_accuracy_seq(input_df)
 ```
