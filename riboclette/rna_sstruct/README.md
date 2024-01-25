@@ -20,7 +20,7 @@ sequences_df = pd.DataFrame(data, columns=["transcript", "sequence"])
 
 ## 1. Install CapR
 ```bash
-git clone https://github.com/fukunagatsu/CapR /path/to/CapR`
+git clone https://github.com/fukunagatsu/CapR /path/to/CapR
 cd /path/to/CapR
 make
 ```
