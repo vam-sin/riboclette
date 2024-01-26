@@ -9,6 +9,9 @@ riboclette/models/xlnet/run_xlnet_dh.sh
 riboclette/models/xlnet/run_plots.sh 
 riboclette/models/xlnet/run_xlnet_conds_dh.sh 
 riboclette/models/xlnet/slurm-*.out
+riboclette/models/xlnet/variance.py
+
+riboclette/models/ribomimo
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

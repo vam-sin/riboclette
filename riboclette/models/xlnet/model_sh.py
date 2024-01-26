@@ -6,7 +6,7 @@ model trained on only one condition samples
 import numpy as np
 import pandas as pd 
 import torch
-from transformers import XLNetConfig, XLNetForTokenClassification
+from transformers import XLNetConfig, XLNetForTokenClassification, EarlyStoppingCallback
 from utils_sh import RegressionTrainer, RiboDatasetGWSDepr, GWSDatasetFromPandas  # custom dataset and trainer
 from transformers import TrainingArguments
 import random
@@ -29,27 +29,47 @@ args = parser.parse_args()
 
 # training arguments
 condition_training = args.condition
-data_folder = '/net/lts2gdk0/mnt/scratch/lts2/nallapar/rb-prof/data/Darnell_Full/Darnell/data_conds_split/processed/'
-annot_thresh = 0.5
+data_folder = '/net/lts2gdk0/mnt/scratch/lts2/nallapar/rb-prof/data/Jan_2024/Lina/processed/'
+annot_thresh = 0.3
+n_layers_val = 3
+d_model_val = 256
+n_heads_val = 8
+batch_size_val = 1
+loss_fun_name = 'MAE_PCC'
 longZerosThresh_val = 20
 percNansThresh_val = 0.05
-model_name = 'XLNetDepr-3_256_8-' + str(condition_training) + '_NA-PEL-BS1-GWS_PCC_IT384_DH_3L_NZ' + str(longZerosThresh_val) + '_PNTh' + str(percNansThresh_val) + '_AnnotThresh' + str(annot_thresh)
+model_name = 'XLNetSHConds DS: ' + str(condition_training) + ' [' + str(n_layers_val) + ', ' + str(d_model_val) + ', ' + str(n_heads_val) + '] FT: [PEL] BS: ' + str(batch_size_val) + ' Loss: ' + str(loss_fun_name) + ' Data Conds: [NZ: ' + str(longZerosThresh_val) + ', PNTh: ' + str(percNansThresh_val) + ', AnnotThresh: ' + str(annot_thresh) + ']'
+output_loc = "saved_models/" + model_name
+
+liver_path = data_folder + 'LIVER.csv'
 
 # dataset paths
 if condition_training == 'CTRL':
-    ctrl_path = data_folder + 'CTRL.csv'
+    ctrl_path = data_folder + 'CTRL_AA.csv'
 elif condition_training == 'LEU':
-    leu_path = data_folder + 'LEU.csv'
-elif condition_training == 'ARG':
-    arg_path = data_folder + 'ARG.csv'
+    leu_path = data_folder + 'LEU_AA.csv'
+elif condition_training == 'ILE':
+    ile_path = data_folder + 'ILE_AA.csv'
+elif condition_training == 'LEU-ILE':
+    leu_ile_path = data_folder + 'LEU-ILE_AA.csv'
+elif condition_training == 'VAL':
+    val_path = data_folder + 'VAL_AA.csv'
+elif condition_training == 'LEU-ILE-VAL':
+    leu_ile_val_path = data_folder + 'LEU-ILE-VAL_AA.csv'
 
 # GWS dataset
 if condition_training == 'CTRL':
-    train_dataset, test_dataset = RiboDatasetGWSDepr(ctrl_path, threshold = annot_thresh, longZerosThresh = longZerosThresh_val, percNansThresh = percNansThresh_val, cond = 'CTRL')
+    train_dataset, test_dataset = RiboDatasetGWSDepr(ctrl_path, threshold = annot_thresh, longZerosThresh = longZerosThresh_val, percNansThresh = percNansThresh_val, cond = 'CTRL', liver_path = liver_path)
 elif condition_training == 'LEU':
-    train_dataset, test_dataset = RiboDatasetGWSDepr(leu_path, threshold = annot_thresh, longZerosThresh = longZerosThresh_val, percNansThresh = percNansThresh_val, cond = 'LEU')
-elif condition_training == 'ARG':
-    train_dataset, test_dataset = RiboDatasetGWSDepr(arg_path, threshold = annot_thresh, longZerosThresh = longZerosThresh_val, percNansThresh = percNansThresh_val, cond = 'ARG')
+    train_dataset, test_dataset = RiboDatasetGWSDepr(leu_path, threshold = annot_thresh, longZerosThresh = longZerosThresh_val, percNansThresh = percNansThresh_val, cond = 'LEU', liver_path = liver_path)
+elif condition_training == 'ILE':
+    train_dataset, test_dataset = RiboDatasetGWSDepr(ile_path, threshold = annot_thresh, longZerosThresh = longZerosThresh_val, percNansThresh = percNansThresh_val, cond = 'ILE', liver_path = liver_path)
+elif condition_training == 'LEU-ILE':
+    train_dataset, test_dataset = RiboDatasetGWSDepr(leu_ile_path, threshold = annot_thresh, longZerosThresh = longZerosThresh_val, percNansThresh = percNansThresh_val, cond = 'LEU_ILE', liver_path = liver_path)
+elif condition_training == 'VAL':
+    train_dataset, test_dataset = RiboDatasetGWSDepr(val_path, threshold = annot_thresh, longZerosThresh = longZerosThresh_val, percNansThresh = percNansThresh_val, cond = 'VAL', liver_path = liver_path)
+elif condition_training == 'LEU-ILE-VAL':
+    train_dataset, test_dataset = RiboDatasetGWSDepr(leu_ile_val_path, threshold = annot_thresh, longZerosThresh = longZerosThresh_val, percNansThresh = percNansThresh_val, cond = 'LEU_ILE_VAL', liver_path = liver_path)
 
 # convert to torch dataset
 train_dataset = GWSDatasetFromPandas(train_dataset)
@@ -60,10 +80,10 @@ print("samples in test dataset: ", len(test_dataset))
 
 # load xlnet to train from scratch
 # GWS
-config = XLNetConfig(vocab_size=65, pad_token_id=64, d_model = 256, n_layer = 3, n_head = 8, d_inner = 256, num_labels = 1) # 4^3 + 1 for padding
+config = XLNetConfig(vocab_size=65, pad_token_id=64, d_model = d_model_val, n_layer = n_layers_val, n_head = n_heads_val, d_inner = d_model_val, num_labels = 1) # 4^3 + 1 for padding
 model = XLNetForTokenClassification(config)
 
-model.classifier = torch.nn.Linear(256, 1, bias=True)
+model.classifier = torch.nn.Linear(d_model_val, 1, bias=True)
 
 class CorrCoef(Metric):
     def __init__(self):
@@ -129,7 +149,7 @@ training_args = TrainingArguments(
     gradient_accumulation_steps=1,
     per_device_eval_batch_size=1,
     eval_accumulation_steps=4,
-    num_train_epochs=200,
+    num_train_epochs=100,
     weight_decay=0.01,
     evaluation_strategy="epoch",
     save_strategy="epoch",
@@ -146,6 +166,7 @@ trainer = RegressionTrainer(
     eval_dataset=test_dataset,
     data_collator=collate_fn,
     compute_metrics=compute_metrics,
+    callbacks = [EarlyStoppingCallback(early_stopping_patience=20)]
 )
 
 trainer.train()
