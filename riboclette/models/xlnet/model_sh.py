@@ -51,7 +51,7 @@ elif condition_training == 'LEU':
 elif condition_training == 'ILE':
     ile_path = data_folder + 'ILE_AA.csv'
 elif condition_training == 'LEU-ILE':
-    leu_ile_path = data_folder + 'LEU-ILE_AA.csv'
+    leu_ile_path = data_folder + 'LEU-ILE_AA_remBadRep.csv'
 elif condition_training == 'VAL':
     val_path = data_folder + 'VAL_AA.csv'
 elif condition_training == 'LEU-ILE-VAL':
@@ -70,6 +70,8 @@ elif condition_training == 'VAL':
     train_dataset, test_dataset = RiboDatasetGWSDepr(val_path, threshold = annot_thresh, longZerosThresh = longZerosThresh_val, percNansThresh = percNansThresh_val, cond = 'VAL', liver_path = liver_path)
 elif condition_training == 'LEU-ILE-VAL':
     train_dataset, test_dataset = RiboDatasetGWSDepr(leu_ile_val_path, threshold = annot_thresh, longZerosThresh = longZerosThresh_val, percNansThresh = percNansThresh_val, cond = 'LEU_ILE_VAL', liver_path = liver_path)
+elif condition_training == 'OnlyLiver':
+    train_dataset, test_dataset = RiboDatasetGWSDepr(liver_path, threshold = annot_thresh, longZerosThresh = longZerosThresh_val, percNansThresh = percNansThresh_val, cond = 'OnlyLiver', liver_path = liver_path)
 
 # convert to torch dataset
 train_dataset = GWSDatasetFromPandas(train_dataset)
