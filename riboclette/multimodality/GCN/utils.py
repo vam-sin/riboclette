@@ -4,6 +4,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 from torch_geometric.data import Dataset
+import os
 from transformers import Trainer
 from sklearn.model_selection import train_test_split
 import itertools
@@ -33,49 +34,77 @@ def slidingWindowZeroToNan(a, window_size=30):
 
     return a
 
-def RiboDataset(dataset_split, feature_folder, data_folder, model_type, transform=None, edge_attr=False, sampler=False):
-    # cbert features
-    df_cbert = pd.read_pickle(feature_folder + 'LIVER_CodonBERT.pkl')
+def makePosEnc(seq_len, num_enc):
+    '''
+    make positional encodings
+    '''
+    pos_enc = np.zeros((seq_len, num_enc))
+    for i in range(seq_len):
+        for j in range(num_enc):
+            if j % 2 == 0:
+                pos_enc[i][j] = np.sin(i / 10000 ** (j / num_enc))
+            else:
+                pos_enc[i][j] = np.cos(i / 10000 ** ((j-1) / num_enc))
 
-    # codon ss features
-    df_codon_ss = pd.read_pickle(feature_folder + 'LIVER_VRNA_SS.pkl')
+    return pos_enc
 
-    # load datasets train and test
-    if dataset_split == 'train':
-        dataset_df = pd.read_csv(data_folder + 'train_OnlyLiver_Cov_0.3_NZ_20_PercNan_0.05.csv')
-        transcripts = dataset_df['transcript'].tolist()
+class RiboDataset(Dataset):
+    def __init__(self, dataset_split, feature_folder, data_folder, model_type, transform, edge_attr, sampler):
+        super().__init__()
 
-        df_cbert = df_cbert[df_cbert['transcript'].isin(transcripts)]
-        cbert_embeds = df_cbert['cbert_embeds'].tolist()
-        cbert_embeds_tr = df_cbert['transcript'].tolist()
+        self.dataset_split = dataset_split
+        self.feature_folder = feature_folder
+        self.data_folder = data_folder
+        self.model_type = model_type
+        self.transform = transform
+        self.edge_attr = edge_attr
+        self.sampler = sampler
+        
+        # cbert features
+        df_cbert = pd.read_pickle(feature_folder + 'LIVER_CodonBERT.pkl')
 
-        df_codon_ss = df_codon_ss[df_codon_ss['transcript'].isin(transcripts)]
-        codon_ss = df_codon_ss['codon_RNA_SS'].tolist()
+        # codon ss features
+        df_codon_ss = pd.read_pickle(feature_folder + 'LIVER_VRNA_SS.pkl')
 
-        # norm counts train and test
-        norm_counts = [dataset_df[dataset_df['transcript'] == tr]['annotations'].values[0] for tr in cbert_embeds_tr]
+        # load datasets train and test
+        if dataset_split == 'train':
+            dataset_df = pd.read_csv(data_folder + 'train_OnlyLiver_Cov_0.3_NZ_20_PercNan_0.05.csv')
+            transcripts = dataset_df['transcript'].tolist()
 
-    elif dataset_split == 'test':
-        dataset_df = pd.read_csv(data_folder + 'test_OnlyLiver_Cov_0.3_NZ_20_PercNan_0.05.csv')
-        transcripts = dataset_df['transcript'].tolist()
+            df_cbert = df_cbert[df_cbert['transcript'].isin(transcripts)]
+            self.cbert_embeds = df_cbert['cbert_embeds'].tolist()
+            cbert_embeds_tr = df_cbert['transcript'].tolist()
 
-        df_cbert = df_cbert[df_cbert['transcript'].isin(transcripts)]
-        cbert_embeds = df_cbert['cbert_embeds'].tolist()
-        cbert_embeds_tr = df_cbert['transcript'].tolist()
+            df_codon_ss = df_codon_ss[df_codon_ss['transcript'].isin(transcripts)]
+            self.codon_ss = df_codon_ss['codon_RNA_SS'].tolist()
 
-        df_codon_ss = df_codon_ss[df_codon_ss['transcript'].isin(transcripts)]
-        codon_ss = df_codon_ss['codon_RNA_SS'].tolist()
+            # norm counts train and test
+            self.norm_counts = [dataset_df[dataset_df['transcript'] == tr]['annotations'].values[0] for tr in cbert_embeds_tr]
 
-        # norm counts train and test
-        norm_counts = [dataset_df[dataset_df['transcript'] == tr]['annotations'].values[0] for tr in cbert_embeds_tr]
+        elif dataset_split == 'test':
+            dataset_df = pd.read_csv(data_folder + 'test_OnlyLiver_Cov_0.3_NZ_20_PercNan_0.05.csv')
+            transcripts = dataset_df['transcript'].tolist()
 
-    data_list = []
-    for i in range(len(cbert_embeds)):
-        full_adj_mat = np.asarray(codon_ss[i].todense())
-        len_Seq = len(cbert_embeds[i])
+            df_cbert = df_cbert[df_cbert['transcript'].isin(transcripts)]
+            self.cbert_embeds = df_cbert['cbert_embeds'].tolist()
+            cbert_embeds_tr = df_cbert['transcript'].tolist()
+
+            df_codon_ss = df_codon_ss[df_codon_ss['transcript'].isin(transcripts)]
+            self.codon_ss = df_codon_ss['codon_RNA_SS'].tolist()
+
+            # norm counts train and test
+            self.norm_counts = [dataset_df[dataset_df['transcript'] == tr]['annotations'].values[0] for tr in cbert_embeds_tr]
+
+    def len(self):
+        return len(self.norm_counts)
+    
+    def get(self, idx):
+
+        full_adj_mat = np.asarray(self.codon_ss[idx].todense())
+        len_Seq = len(self.cbert_embeds[idx])
 
         # make an undirected sequence graph
-        if model_type == 'USeq':
+        if self.model_type == 'USeq':
             # make an undirected sequence graph
             adj_mat_useq = np.zeros((len_Seq, len_Seq))
             for j in range(len_Seq-1):
@@ -93,7 +122,7 @@ def RiboDataset(dataset_split, feature_folder, data_folder, model_type, transfor
             for j in range(len(ei[0])):
                 ea.append([0])
 
-        elif model_type == 'USeq+':
+        elif self.model_type == 'USeq+':
             # make an undirected sequence graph
             adj_mat_useq = np.zeros((len_Seq, len_Seq))
             for j in range(len_Seq-1):
@@ -118,7 +147,7 @@ def RiboDataset(dataset_split, feature_folder, data_folder, model_type, transfor
                 else:
                     ea.append([1])
 
-        elif model_type == 'DirSeq':
+        elif self.model_type == 'DirSeq':
             # make a directed sequence graph
             adj_mat_dirseq = np.zeros((len_Seq, len_Seq))
             for j in range(1, len_Seq):
@@ -135,7 +164,7 @@ def RiboDataset(dataset_split, feature_folder, data_folder, model_type, transfor
             for j in range(len(ei[0])):
                 ea.append([0])
 
-        elif model_type == 'DirSeq+':
+        elif self.model_type == 'DirSeq+':
             # make an undirected sequence graph
             adj_mat_useq = np.zeros((len_Seq, len_Seq))
             for j in range(len_Seq-1):
@@ -165,11 +194,17 @@ def RiboDataset(dataset_split, feature_folder, data_folder, model_type, transfor
                 else:
                     ea.append([1])
 
+        # make positional encodings 
+        pos_enc = makePosEnc(len_Seq, 32)
+
         # merge and then convert to torch tensor
-        ft_vec = torch.from_numpy(cbert_embeds[i]).float()
+        ft_vec = np.concatenate((self.cbert_embeds[idx], pos_enc), axis=1)
+        ft_vec = torch.from_numpy(ft_vec).float()
+                    
+        # ft_vec = torch.from_numpy(self.cbert_embeds[idx]).float()
 
         # output label
-        y_i = norm_counts[i]
+        y_i = self.norm_counts[idx]
         y_i = y_i[1:-1].split(',')
         y_i = [float(el) for el in y_i]
         y_i = slidingWindowZeroToNan(y_i, window_size=30)
@@ -183,25 +218,54 @@ def RiboDataset(dataset_split, feature_folder, data_folder, model_type, transfor
         ea = torch.from_numpy(ea).float()
 
         # make a data object
-        if edge_attr:
+        if self.edge_attr:
             data = Data(edge_index = ei, x = ft_vec, y = y_i, edge_attr = ea)
+            del ea
         else:
             data = Data(edge_index = ei, x = ft_vec, y = y_i)
 
-        # apply transform to data
-        if transform:
-            data = transform(data)
+        del ei, ft_vec, y_i
 
-        if sampler:
+        # apply transform to data
+        if self.transform:
+            data = self.transform(data)
+
+        if self.sampler:
             loader = NeighborLoader(data, num_neighbors=[5] * 2, batch_size=1)
             sample = next(iter(loader))
 
-            data_list.append(sample)
+            return sample
         else:
-            data_list.append(data)
+            return data
 
-    return data_list
+class FileRiboDataset(Dataset):
+    def __init__(self, data_folder, dataset_split, edge_attr, shuffle):
+        super().__init__()
+
+        self.data_folder = data_folder
+        self.dataset_split = dataset_split
+        self.edge_attr = edge_attr
+
+        # get all filenames in the folder
+        self.files = os.listdir(data_folder + dataset_split)
+
+        # shuffle files
+        if shuffle:
+            np.random.shuffle(self.files)
+
+    def len(self):
+        return len(self.files)
     
+    def get(self, idx):
+        # load the file
+        data = torch.load(self.data_folder + self.dataset_split + '/' + self.files[idx])
+
+        # edge_attr
+        if self.edge_attr == False:
+            data.edge_attr = None
+
+        return data
+
 class MaskedPearsonLoss(nn.Module):
     def __init__(self):
         super().__init__()
@@ -261,8 +325,11 @@ class ConvModule(nn.Module):
             self.conv_in = SAGEConv(in_channels, out_channels)
             self.conv_out = SAGEConv(in_channels, out_channels)
         elif algo == 'GAT':
-            self.conv_in = GATConv(in_channels, out_channels, heads = 8)
-            self.conv_out = GATConv(in_channels, out_channels, heads = 8)
+            self.conv_in = GATConv(in_channels, out_channels, heads = 8, add_self_loops = False)
+            self.conv_out = GATConv(in_channels, out_channels, heads = 8, add_self_loops = False)
+        elif algo == 'GATv2':
+            self.conv_in = GATv2Conv(in_channels, out_channels, heads = 8, add_self_loops = False)
+            self.conv_out = GATv2Conv(in_channels, out_channels, heads = 8, add_self_loops = False)
 
         self.alpha = alpha
         self.model_type = model_type
@@ -279,7 +346,7 @@ class ConvModule(nn.Module):
 
             return x_in + x_out
 
-class GCN(L.LightningModule):
+class GCN(L.LightningModule):                                            
     def __init__(self, gcn_layers, dropout_val, num_epochs, bs, lr, num_inp_ft, alpha, model_type, algo):
         super().__init__()
     
@@ -297,9 +364,9 @@ class GCN(L.LightningModule):
 
         self.dropout = nn.Dropout(dropout_val)
 
-        self.bilstm = nn.LSTM(np.sum(gcn_layers), 256, num_layers = 4, bidirectional=True)
+        self.bilstm = nn.LSTM(np.sum(gcn_layers), 128, num_layers = 4, bidirectional=True)
 
-        self.linear = nn.Linear(512, 1)
+        self.linear = nn.Linear(256, 1)
         # self.linear = nn.Linear(np.sum(gcn_layers), 1)
         
         self.relu = nn.ReLU()
@@ -323,7 +390,7 @@ class GCN(L.LightningModule):
             x = self.module_list[i](x, ei)
             
             # only for GAT
-            if self.algo == 'GAT':
+            if self.algo == 'GAT' or self.algo == 'GATv2':
                 x = x.reshape(x.shape[0], self.gcn_layers[i], 8)
                 # mean over final dimension
                 x = torch.mean(x, dim=2)
@@ -337,8 +404,8 @@ class GCN(L.LightningModule):
         out = torch.cat(outputs, dim=1)
 
         # bilstm final layer
-        h_0 = Variable(torch.zeros(8, 1, 256).cuda()) # (1, bs, hidden)
-        c_0 = Variable(torch.zeros(8, 1, 256).cuda()) # (1, bs, hidden)
+        h_0 = Variable(torch.zeros(8, 1, 128).cuda()) # (1, bs, hidden)
+        c_0 = Variable(torch.zeros(8, 1, 128).cuda()) # (1, bs, hidden)
 
         out = out.unsqueeze(1)
         out, (fin_h, fin_c) = self.bilstm(out, (h_0, c_0))
@@ -354,7 +421,7 @@ class GCN(L.LightningModule):
     
     def _get_loss(self, batch):
         # get features and labels
-        batch = batch[0]
+        # batch = batch[0]
         y = batch.y
 
         # pass through model
@@ -437,6 +504,3 @@ def trainGCN(gcn_layers, num_epochs, bs, lr, save_loc, wandb_logger, train_loade
     result = {"test": test_result}
     return model, result
     
-
-        
-
