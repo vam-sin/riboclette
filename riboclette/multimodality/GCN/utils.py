@@ -15,7 +15,7 @@ from torch_geometric.utils.convert import from_scipy_sparse_matrix
 from torch_geometric.data import Data
 from torch_geometric.nn import GATConv
 from torch_geometric.nn.norm import GraphNorm
-from torch_geometric.nn.conv import SAGEConv, GATv2Conv
+from torch_geometric.nn.conv import SAGEConv, GATv2Conv, GINEConv, TransformerConv
 from torch_geometric.sampler import NeighborSampler
 from torch_geometric.loader import NeighborLoader
 from torch.autograd import Variable
@@ -260,9 +260,11 @@ class FileRiboDataset(Dataset):
         # load the file
         data = torch.load(self.data_folder + self.dataset_split + '/' + self.files[idx])
 
-        # edge_attr
-        if self.edge_attr == False:
+        # # edge_attr
+        if self.edge_attr == 'None':
             data.edge_attr = None
+        elif self.edge_attr == 'Zero':
+            data.edge_attr = torch.zeros(data.edge_index.shape[1], 2)
 
         return data
 
@@ -318,36 +320,55 @@ class MaskedPCCL1Loss(nn.Module):
         return l1 + pcc, pcc
 
 class ConvModule(nn.Module):
-    def __init__(self, in_channels, out_channels, alpha, model_type, algo):
+    def __init__(self, in_channels, out_channels, model_type, algo, edge_attr):
         super().__init__()
 
+        self.algo = algo
+
         if algo == 'SAGE':
-            self.conv_in = SAGEConv(in_channels, out_channels)
-            self.conv_out = SAGEConv(in_channels, out_channels)
+            self.conv_in = SAGEConv(in_channels, out_channels, project = True)
+            self.conv_out = SAGEConv(in_channels, out_channels, project = True)
         elif algo == 'GAT':
             self.conv_in = GATConv(in_channels, out_channels, heads = 8, add_self_loops = False)
             self.conv_out = GATConv(in_channels, out_channels, heads = 8, add_self_loops = False)
         elif algo == 'GATv2':
             self.conv_in = GATv2Conv(in_channels, out_channels, heads = 8, add_self_loops = False)
             self.conv_out = GATv2Conv(in_channels, out_channels, heads = 8, add_self_loops = False)
+        elif algo == 'GINE':
+            self.conv_in = GINEConv(nn.Linear(in_channels, out_channels), edge_dim = 2)
+            self.conv_out = GINEConv(nn.Linear(in_channels, out_channels), edge_dim = 2)
+        elif algo == 'TF':
+            if edge_attr != 'Yes':
+                self.conv_in = TransformerConv(in_channels, out_channels, heads = 8, concat = False)
+                self.conv_out = TransformerConv(in_channels, out_channels, heads = 8, concat = False)
+            else:
+                self.conv_in = TransformerConv(in_channels, out_channels, heads = 8, concat = False, edge_dim = 2)
+                self.conv_out = TransformerConv(in_channels, out_channels, heads = 8, concat = False, edge_dim = 2)
 
-        self.alpha = alpha
         self.model_type = model_type
+        self.edge_attr = edge_attr
 
-    def forward(self, x, ei):
+    def forward(self, x, ei, ea):
         if self.model_type == 'USeq' or self.model_type == 'USeq+':
-            x_in = self.conv_in(x, ei)
+            if self.edge_attr == 'Yes':
+                x_in = self.conv_in(x, ei, ea)
+            else:
+                x_in = self.conv_in(x, ei)
 
             return x_in
 
         elif self.model_type == 'DirSeq' or self.model_type == 'DirSeq+':
-            x_in = self.conv_in(x, ei)
-            x_out = self.conv_out(x, ei.flip(dims=(0,)))
+            if self.edge_attr == 'Yes':
+                x_in = self.conv_in(x, ei, ea)
+                x_out = self.conv_out(x, ei.flip(dims=(0,)), ea)
+            else:
+                x_in = self.conv_in(x, ei)
+                x_out = self.conv_out(x, ei.flip(dims=(0,)))
 
             return x_in + x_out
 
 class GCN(L.LightningModule):                                            
-    def __init__(self, gcn_layers, dropout_val, num_epochs, bs, lr, num_inp_ft, alpha, model_type, algo):
+    def __init__(self, gcn_layers, dropout_val, num_epochs, bs, lr, num_inp_ft, model_type, algo, edge_attr):
         super().__init__()
     
         self.gcn_layers = gcn_layers
@@ -355,11 +376,11 @@ class GCN(L.LightningModule):
         self.module_list = nn.ModuleList()
         self.graph_norm_list = nn.ModuleList()
 
-        self.module_list.append(ConvModule(num_inp_ft, gcn_layers[0], alpha, model_type, algo)) 
+        self.module_list.append(ConvModule(num_inp_ft, gcn_layers[0], model_type, algo, edge_attr)) 
         self.graph_norm_list.append(GraphNorm(gcn_layers[0]))
         
         for i in range(len(gcn_layers)-1):
-            self.module_list.append(ConvModule(gcn_layers[i], gcn_layers[i+1], alpha, model_type, algo))
+            self.module_list.append(ConvModule(gcn_layers[i], gcn_layers[i+1], model_type, algo, edge_attr))
             self.graph_norm_list.append(GraphNorm(gcn_layers[i+1]))
 
         self.dropout = nn.Dropout(dropout_val)
@@ -381,13 +402,15 @@ class GCN(L.LightningModule):
         self.model_type = model_type
         self.algo = algo
 
+        self.test_perf_list = []
+
     def forward(self, data):
-        x, ei = data.x, data.edge_index
+        x, ei, ea = data.x, data.edge_index, data.edge_attr
 
         outputs = []
 
         for i in range(len(self.gcn_layers)):
-            x = self.module_list[i](x, ei)
+            x = self.module_list[i](x, ei, ea)
             
             # only for GAT
             if self.algo == 'GAT' or self.algo == 'GATv2':
@@ -421,14 +444,10 @@ class GCN(L.LightningModule):
     
     def _get_loss(self, batch):
         # get features and labels
-        # batch = batch[0]
         y = batch.y
 
         # pass through model
         y_pred = self.forward(batch)
-        
-        # # remove virtual node from y_pred (other way) - this is better
-        # y_pred = y_pred[:-1]
 
         # calculate loss
         lengths = torch.tensor([y.shape[0]]).to(y_pred)
@@ -450,6 +469,9 @@ class GCN(L.LightningModule):
         return [optimizer], [scheduler]
     
     def training_step(self, batch):
+        # adding noise
+        batch.y = batch.y + torch.normal(0, 0.2, size=batch.y.shape).to(batch.y.device)
+
         loss, perf = self._get_loss(batch)
 
         self.log('train_loss', loss, batch_size=self.bs)
@@ -471,9 +493,27 @@ class GCN(L.LightningModule):
         self.log('test_loss', loss)
         self.log('test_perf', perf)
 
+        self.test_perf_list.append(perf.item())
+
+        # save this at epoch end
+        if len(self.test_perf_list) == 1284:
+            # convert to df and save
+            test_perf_df = pd.DataFrame(self.test_perf_list)
+            test_perf_df.to_csv('test_perf.csv')
+
         return loss
     
-def trainGCN(gcn_layers, num_epochs, bs, lr, save_loc, wandb_logger, train_loader, test_loader, dropout_val, num_inp_ft, alpha, model_type, algo):
+    # on epoch end testing
+    def _on_test_epoch_end(self, outputs):
+        # save each test perf into a dataframe
+        print(outputs)
+        test_perf = [x for x in outputs]
+
+        # save as df and then save to csv
+        test_perf_df = pd.DataFrame(test_perf)
+        test_perf_df.to_csv('test_perf.csv')
+    
+def trainGCN(gcn_layers, num_epochs, bs, lr, save_loc, wandb_logger, train_loader, test_loader, dropout_val, num_inp_ft, model_type, algo, edge_attr):
     # Create a PyTorch Lightning trainer with the generation callback
     trainer = L.Trainer(
         default_root_dir=save_loc,
@@ -493,14 +533,22 @@ def trainGCN(gcn_layers, num_epochs, bs, lr, save_loc, wandb_logger, train_loade
     trainer.logger._log_graph = False  # If True, we plot the computation graph in tensorboard
     trainer.logger._default_hp_metric = None  # Optional logging argument that we don't need
 
-    total_batches = len(train_loader) * num_epochs
-
-    # Check whether pretrained model exists. If yes, load it and skip training
-    model = GCN(gcn_layers, dropout_val, num_epochs, bs, lr, num_inp_ft, alpha, model_type, algo)
+    # Training
+    # # Check whether pretrained model exists. If yes, load it and skip training
+    model = GCN(gcn_layers, dropout_val, num_epochs, bs, lr, num_inp_ft, model_type, algo, edge_attr)
     # fit trainer
     trainer.fit(model, train_dataloaders = train_loader, val_dataloaders = test_loader)
     # Test best model on test set
-    test_result = trainer.test(model, dataloaders=test_loader, verbose=False, ckpt_path="best")
+    test_result = trainer.test(model, dataloaders = test_loader, verbose = False, ckpt_path = "best")
     result = {"test": test_result}
+
+    # Testing
+    # pretrained model loading
+    # model = GCN.load_from_checkpoint(save_loc + '/epoch=16-step=41956.ckpt', gcn_layers=gcn_layers, dropout_val=dropout_val, num_epochs=num_epochs, bs=bs, lr=lr, num_inp_ft=num_inp_ft, alpha=alpha, model_type=model_type, algo=algo)
+    # model.eval()
+
+    # # test on this model
+    # result = trainer.test(model, dataloaders=test_loader, verbose=False)
+
     return model, result
     

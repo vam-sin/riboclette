@@ -8,6 +8,7 @@ from transformers import Trainer
 from sklearn.model_selection import train_test_split
 import torch_geometric.transforms as T
 import itertools
+import argparse
 import os
 import lightning as L
 from scipy import sparse
@@ -48,7 +49,7 @@ def makePosEnc(seq_len, num_enc):
 
     return pos_enc
 
-def RiboDataset(dataset_split, feature_folder, data_folder, model_type, transform, edge_attr, sampler, out_folder):
+def RiboDataset(dataset_split, feature_folder, data_folder, model_type, transform, out_folder):
         
     # cbert features
     df_cbert = pd.read_pickle(feature_folder + 'LIVER_CodonBERT.pkl')
@@ -105,11 +106,6 @@ def RiboDataset(dataset_split, feature_folder, data_folder, model_type, transfor
             # convert to edge index and edge weight
             ei, ew = from_scipy_sparse_matrix(adj_mat_useq)
 
-            # ea - edge attributes
-            ea = []
-            for j in range(len(ei[0])):
-                ea.append([0])
-
         elif model_type == 'USeq+':
             # make an undirected sequence graph
             adj_mat_useq = np.zeros((len_Seq, len_Seq))
@@ -127,14 +123,6 @@ def RiboDataset(dataset_split, feature_folder, data_folder, model_type, transfor
             # convert to edge index and edge weight
             ei, ew = from_scipy_sparse_matrix(adj_mat_useqPlus)
 
-            # ea - edge attributes
-            ea = []
-            for j in range(len(ei[0])):
-                if np.abs(ei[0][j] - ei[1][j]) == 1:
-                    ea.append([0])
-                else:
-                    ea.append([1])
-
         elif model_type == 'DirSeq':
             # make a directed sequence graph
             adj_mat_dirseq = np.zeros((len_Seq, len_Seq))
@@ -150,7 +138,22 @@ def RiboDataset(dataset_split, feature_folder, data_folder, model_type, transfor
             # ea - edge attributes
             ea = []
             for j in range(len(ei[0])):
-                ea.append([0])
+                if np.abs(ei[0][j] - ei[1][j]) == 1:
+                    ea.append([0])
+                else:
+                    ea.append([1])
+
+            ea = np.asarray(ea)
+            ea = torch.from_numpy(ea).float()
+
+            ew = torch.ones(ei.shape[1])
+
+            for j in range(ei.shape[1]):
+                if np.abs(ei[0][j] - ei[1][j]) != 1:
+                    ew[j] = (np.abs(ei[0][j] - ei[1][j]) / len_Seq)
+
+            # combine edge_attr and edge_weight into data.edge_attr 
+            ea = torch.cat((ea, ew.unsqueeze(1)), dim=1)
 
         elif model_type == 'DirSeq+':
             # make an undirected sequence graph
@@ -182,6 +185,18 @@ def RiboDataset(dataset_split, feature_folder, data_folder, model_type, transfor
                 else:
                     ea.append([1])
 
+            ea = np.asarray(ea)
+            ea = torch.from_numpy(ea).float()
+
+            ew = torch.ones(ei.shape[1])
+
+            for j in range(ei.shape[1]):
+                if np.abs(ei[0][j] - ei[1][j]) != 1:
+                    ew[j] = (np.abs(ei[0][j] - ei[1][j]) / len_Seq)
+
+            # combine edge_attr and edge_weight into data.edge_attr 
+            ea = torch.cat((ea, ew.unsqueeze(1)), dim=1)
+
         # make positional encodings 
         pos_enc = makePosEnc(len_Seq, 32)
 
@@ -201,31 +216,18 @@ def RiboDataset(dataset_split, feature_folder, data_folder, model_type, transfor
         y_i = np.log(y_i)
         y_i = torch.from_numpy(y_i).float()
 
-        # edge attr
-        ea = np.asarray(ea)
-        ea = torch.from_numpy(ea).float()
-
         # make a data object
-        if edge_attr:
-            data = Data(edge_index = ei, x = ft_vec, y = y_i, edge_attr = ea)
-            del ea
-        else:
-            data = Data(edge_index = ei, x = ft_vec, y = y_i)
+        # data = Data(edge_index = ei, x = ft_vec, y = y_i, edge_attr = ea)
+        data = Data(edge_index = ei, x = ft_vec, y = y_i)
 
+        # del ei, ft_vec, y_i, ea
         del ei, ft_vec, y_i
 
         # apply transform to data
         if transform:
             data = transform(data)
 
-        if sampler:
-            loader = NeighborLoader(data, num_neighbors=[5] * 2, batch_size=1)
-            sample = next(iter(loader))
-
-            return sample
-        else:
-            # save into out_folder
-            torch.save(data, out_folder + dataset_split + '/sample_' + str(i) + '.pt')
+        torch.save(data, out_folder + dataset_split + '/sample_' + str(i) + '.pt')
         
 if __name__ == '__main__':
     feature_folder = '/net/lts2gdk0/mnt/scratch/lts2/nallapar/rb-prof/data/Jan_2024/Lina/processed/mm/'
@@ -234,11 +236,21 @@ if __name__ == '__main__':
     
     transforms = T.Compose([T.AddRandomWalkPE(walk_length=random_walk_length), T.VirtualNode()])
 
-    model_type = 'USeq+'
-    edge_attr = True
-    out_folder = '/net/lts2gdk0/mnt/scratch/lts2/nallapar/rb-prof/data/Jan_2024/Lina/processed/mm/USeqPlus/'
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--model_type', type=str, default='DirSeq+', help='condition to train on') # USeq, USeq+, DirSeq, DirSeq+
+    args = parser.parse_args()
+    model_type = args.model_type # USeq, USeq+, DirSeq, DirSeq+
+
+    if model_type == 'USeq':
+        out_folder = '/net/lts2gdk0/mnt/scratch/lts2/nallapar/rb-prof/data/Jan_2024/Lina/processed/mm/USeq/' # USeq, USeqPlus, DirSeq, DirSeqPlus
+    elif model_type == 'USeq+':
+        out_folder = '/net/lts2gdk0/mnt/scratch/lts2/nallapar/rb-prof/data/Jan_2024/Lina/processed/mm/USeqPlus/' # USeq, USeqPlus, DirSeq, DirSeqPlus
+    elif model_type == 'DirSeq':
+        out_folder = '/net/lts2gdk0/mnt/scratch/lts2/nallapar/rb-prof/data/Jan_2024/Lina/processed/mm/DirSeq/' # USeq, USeqPlus, DirSeq, DirSeqPlus
+    elif model_type == 'DirSeq+':
+        out_folder = '/net/lts2gdk0/mnt/scratch/lts2/nallapar/rb-prof/data/Jan_2024/Lina/processed/mm/DirSeqPlus/' # USeq, USeqPlus, DirSeq, DirSeqPlus
 
     print("Train Process")
-    dat = RiboDataset('train', feature_folder, data_folder, model_type, transforms, edge_attr, sampler=False, out_folder=out_folder)
+    dat = RiboDataset('train', feature_folder, data_folder, model_type, transforms, out_folder=out_folder)
     print("Test Process")
-    dat = RiboDataset('test', feature_folder, data_folder, model_type, transforms, edge_attr, sampler=False, out_folder=out_folder)
+    dat = RiboDataset('test', feature_folder, data_folder, model_type, transforms, out_folder=out_folder)
