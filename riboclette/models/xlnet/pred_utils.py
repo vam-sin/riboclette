@@ -396,7 +396,7 @@ def layergradactivation_output(model, x):
 
     return df_attr_weights
 
-def integratedgrad_output(model, x):
+def integratedgrad_output(model, x, y):
     model_fin = model_finalexpLIG(model)
         
     lig = LayerIntegratedGradients(model_fin, model_fin.model.transformer.word_embedding)
@@ -418,13 +418,17 @@ def integratedgrad_output(model, x):
         len_sample = len(x)
         attributions_sample = np.zeros((len_sample, len_sample))
 
+        # get indices of top 95% of values in y 
+        quantile_95 = np.nanquantile(y, 0.95)
+        indices = np.where(y > quantile_95)[0]
+
         for j in range(len_sample):
             index_val = j
 
             index_val = torch.tensor(index_val).to(device)
 
             attributions, approximation_error = lig.attribute((out_batch["input_ids"]), baselines=baseline_inp, 
-                                                    method = 'gausslegendre', return_convergence_delta = True, additional_forward_args=index_val, n_steps=20, internal_batch_size=2048)
+                                                    method = 'gausslegendre', return_convergence_delta = True, additional_forward_args=index_val, n_steps=20, internal_batch_size=8192)
 
             
             attributions = attributions.squeeze(1)
@@ -440,8 +444,10 @@ def integratedgrad_output(model, x):
     attr_weight_df = []
     for i in range(len(attributions_sample)):
         for j in range(len(attributions_sample)):
-            pos_A_site_df.append(j-i)
-            attr_weight_df.append(np.abs(attributions_sample[i][j]))
+            # if value is non zero then add to the dataframe
+            if attributions_sample[i][j] != 0.0:
+                pos_A_site_df.append(j-i)
+                attr_weight_df.append(np.abs(attributions_sample[i][j]))
 
     df_attr_weights = pd.DataFrame({'Relative Distance from A Site': pos_A_site_df, 'LIG Weight': attr_weight_df})
 
@@ -457,7 +463,7 @@ def interpretability_plot(model, x, y, ctrl_y, pred_y, save_path, pred_pcc, tran
     print('attention done')
     gradxact_df = layergradactivation_output(model, x)
     print('gradxact done')
-    intgrad_df = integratedgrad_output(model, x)
+    intgrad_df = integratedgrad_output(model, x, y)
     print('intgrad done')
 
     print('making plots')

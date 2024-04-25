@@ -16,11 +16,11 @@ from torch import nn
 from torchmetrics.functional import pearson_corrcoef
 from torchmetrics import Metric
 import argparse
+import wandb 
+import pytorch_lightning as pl
 
 # reproducibility
-random.seed(42)
-np.random.seed(42)
-torch.manual_seed(42)
+pl.seed_everything(1)
 
 # parse arguments
 parser = argparse.ArgumentParser()
@@ -41,37 +41,24 @@ percNansThresh_val = 0.05
 model_name = 'XLNetSHConds DS: ' + str(condition_training) + ' [' + str(n_layers_val) + ', ' + str(d_model_val) + ', ' + str(n_heads_val) + '] FT: [PEL] BS: ' + str(batch_size_val) + ' Loss: ' + str(loss_fun_name) + ' Data Conds: [NZ: ' + str(longZerosThresh_val) + ', PNTh: ' + str(percNansThresh_val) + ', AnnotThresh: ' + str(annot_thresh) + ']'
 output_loc = "saved_models/" + model_name
 
-liver_path = data_folder + 'LIVER.csv'
-
-# dataset paths
-if condition_training == 'CTRL':
-    ctrl_path = data_folder + 'CTRL_AA.csv'
-elif condition_training == 'LEU':
-    leu_path = data_folder + 'LEU_AA.csv'
-elif condition_training == 'ILE':
-    ile_path = data_folder + 'ILE_AA.csv'
-elif condition_training == 'LEU-ILE':
-    leu_ile_path = data_folder + 'LEU-ILE_AA_remBadRep.csv'
-elif condition_training == 'VAL':
-    val_path = data_folder + 'VAL_AA.csv'
-elif condition_training == 'LEU-ILE-VAL':
-    leu_ile_val_path = data_folder + 'LEU-ILE-VAL_AA.csv'
+# set wandb project and model_name
+wandb.init(project='XLNet-DH', name=model_name)
 
 # GWS dataset
 if condition_training == 'CTRL':
-    train_dataset, test_dataset = RiboDatasetGWSDepr(ctrl_path, threshold = annot_thresh, longZerosThresh = longZerosThresh_val, percNansThresh = percNansThresh_val, cond = 'CTRL', liver_path = liver_path)
+    train_dataset, test_dataset = RiboDatasetGWSDepr(threshold = annot_thresh, longZerosThresh = longZerosThresh_val, percNansThresh = percNansThresh_val, cond = 'CTRL')
 elif condition_training == 'LEU':
-    train_dataset, test_dataset = RiboDatasetGWSDepr(leu_path, threshold = annot_thresh, longZerosThresh = longZerosThresh_val, percNansThresh = percNansThresh_val, cond = 'LEU', liver_path = liver_path)
+    train_dataset, test_dataset = RiboDatasetGWSDepr(threshold = annot_thresh, longZerosThresh = longZerosThresh_val, percNansThresh = percNansThresh_val, cond = 'LEU')
 elif condition_training == 'ILE':
-    train_dataset, test_dataset = RiboDatasetGWSDepr(ile_path, threshold = annot_thresh, longZerosThresh = longZerosThresh_val, percNansThresh = percNansThresh_val, cond = 'ILE', liver_path = liver_path)
+    train_dataset, test_dataset = RiboDatasetGWSDepr(threshold = annot_thresh, longZerosThresh = longZerosThresh_val, percNansThresh = percNansThresh_val, cond = 'ILE')
 elif condition_training == 'LEU-ILE':
-    train_dataset, test_dataset = RiboDatasetGWSDepr(leu_ile_path, threshold = annot_thresh, longZerosThresh = longZerosThresh_val, percNansThresh = percNansThresh_val, cond = 'LEU_ILE', liver_path = liver_path)
+    train_dataset, test_dataset = RiboDatasetGWSDepr(threshold = annot_thresh, longZerosThresh = longZerosThresh_val, percNansThresh = percNansThresh_val, cond = 'LEU_ILE')
 elif condition_training == 'VAL':
-    train_dataset, test_dataset = RiboDatasetGWSDepr(val_path, threshold = annot_thresh, longZerosThresh = longZerosThresh_val, percNansThresh = percNansThresh_val, cond = 'VAL', liver_path = liver_path)
+    train_dataset, test_dataset = RiboDatasetGWSDepr(threshold = annot_thresh, longZerosThresh = longZerosThresh_val, percNansThresh = percNansThresh_val, cond = 'VAL')
 elif condition_training == 'LEU-ILE-VAL':
-    train_dataset, test_dataset = RiboDatasetGWSDepr(leu_ile_val_path, threshold = annot_thresh, longZerosThresh = longZerosThresh_val, percNansThresh = percNansThresh_val, cond = 'LEU_ILE_VAL', liver_path = liver_path)
+    train_dataset, test_dataset = RiboDatasetGWSDepr(threshold = annot_thresh, longZerosThresh = longZerosThresh_val, percNansThresh = percNansThresh_val, cond = 'LEU_ILE_VAL')
 elif condition_training == 'OnlyLiver':
-    train_dataset, test_dataset = RiboDatasetGWSDepr(liver_path, threshold = annot_thresh, longZerosThresh = longZerosThresh_val, percNansThresh = percNansThresh_val, cond = 'OnlyLiver', liver_path = liver_path)
+    train_dataset, test_dataset = RiboDatasetGWSDepr(threshold = annot_thresh, longZerosThresh = longZerosThresh_val, percNansThresh = percNansThresh_val, cond = 'OnlyLiver')
 
 # convert to torch dataset
 train_dataset = GWSDatasetFromPandas(train_dataset)
@@ -168,7 +155,7 @@ trainer = RegressionTrainer(
     eval_dataset=test_dataset,
     data_collator=collate_fn,
     compute_metrics=compute_metrics,
-    callbacks = [EarlyStoppingCallback(early_stopping_patience=20)]
+    callbacks = [EarlyStoppingCallback(early_stopping_patience=10)]
 )
 
 trainer.train()
