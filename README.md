@@ -14,7 +14,7 @@ Riboclette is a transformer-based deep learning model that is capable of predict
 
 BiLSTM Model Training - Combined Single-Head Variant
 
-'''python3
+``python3
 cd /riboclette/models/bilstm/csh
 papermill bilstm_csh_train.ipynb
-'''
+``
