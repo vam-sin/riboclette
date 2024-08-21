@@ -4,12 +4,9 @@ import numpy as np
 import torch
 import torch.nn as nn
 from torch.utils.data import Dataset
-from transformers import Trainer
-from sklearn.model_selection import train_test_split
 import itertools
-import os
+import time
 import lightning as L
-from scipy import sparse
 from torch.autograd import Variable
 
 id_to_codon = {idx:''.join(el) for idx, el in enumerate(itertools.product(['A', 'T', 'C', 'G'], repeat=3))}
@@ -97,31 +94,32 @@ def uniqueGenes(df):
 
     return df
 
-def RiboDatasetGWSDepr(threshold: float = 0.6, longZerosThresh: int = 20, percNansThresh: float = 0.1, cond: str = 'LEU'):
+def RiboDatasetGWSDepr(threshold: float = 0.6, longZerosThresh: int = 20, percNansThresh: float = 0.1):
     '''
     Dataset generation function
     '''
     # save the dataframes
-    out_train_path = '../xlnet/data/dh/train_' + str(threshold) + '_NZ_' + str(longZerosThresh) + '_PercNan_' + str(percNansThresh) + '.csv'
-    out_test_path = '../xlnet/data/dh/test_' + str(threshold) + '_NZ_' + str(longZerosThresh) + '_PercNan_' + str(percNansThresh) + '.csv'
+    out_train_path = 'data/orig/train_' + str(threshold) + '_NZ_' + str(longZerosThresh) + '_PercNan_' + str(percNansThresh) + '.csv'
+    out_test_path = 'data/orig/test_' + str(threshold) + '_NZ_' + str(longZerosThresh) + '_PercNan_' + str(percNansThresh) + '.csv'
+    out_val_path = 'data/orig/val_' + str(threshold) + '_NZ_' + str(longZerosThresh) + '_PercNan_' + str(percNansThresh) + '.csv'
+
+    # out_train_path = '../../data/orig/train_' + str(threshold) + '_NZ_' + str(longZerosThresh) + '_PercNan_' + str(percNansThresh) + '.csv'
+    # out_test_path = '../../data/orig/test_' + str(threshold) + '_NZ_' + str(longZerosThresh) + '_PercNan_' + str(percNansThresh) + '.csv'
+    # out_val_path = '../../data/orig/val_' + str(threshold) + '_NZ_' + str(longZerosThresh) + '_PercNan_' + str(percNansThresh) + '.csv'
 
     df_train = pd.read_csv(out_train_path)
+    df_val = pd.read_csv(out_val_path)
     df_test = pd.read_csv(out_test_path)
 
-    # choose the conditions
-    df_train = df_train[df_train['condition'] == cond]
-    df_test = df_test[df_test['condition'] == cond]
-
-    return df_train, df_test
+    return df_train, df_val, df_test
 
 class GWSDatasetFromPandas(Dataset):
-    '''
-    converts dataset from pandas dataframe to pytorch dataset
-    '''
     def __init__(self, df):
         self.df = df
         self.counts = list(self.df['annotations'])
         self.sequences = list(self.df['sequence'])
+        self.condition_lists = list(self.df['condition'])
+        self.condition_values = {'CTRL': 64, 'ILE': 65, 'LEU': 66, 'LEU_ILE': 67, 'LEU_ILE_VAL': 68, 'VAL': 69}
 
     def __len__(self):
         return len(self.df)
@@ -137,20 +135,28 @@ class GWSDatasetFromPandas(Dataset):
         y = y[1:-1].split(', ')
         y = [float(i) for i in y]
 
-        # sliding window to make long zeros into nans
-        y = slidingWindowZeroToNan(y, window_size=30)
+        y = slidingWindowZeroToNan(y)
 
-        # min max scaling (Do not do this, this reduces the performance)
         y = [1+i for i in y]
         y = np.log(y)
 
         X = np.array(X)
+        # multiply X with condition value times 64 + 1
+        cond_token = self.condition_values[self.condition_lists[idx]]
+        
+        # prepend the condition token to X
+        X = np.insert(X, 0, cond_token)
+
         y = np.array(y)
 
         X = torch.from_numpy(X).long()
         y = torch.from_numpy(y).float()
 
-        return X, y
+        gene = self.df['gene'].iloc[idx]
+        transcript = self.df['transcript'].iloc[idx]
+        condition = self.df['condition'].iloc[idx]
+
+        return X, y, gene, transcript, condition
 
 class MaskedPearsonLoss(nn.Module):
     def __init__(self):
@@ -175,24 +181,6 @@ class MaskedL1Loss(nn.Module):
         loss = nn.functional.l1_loss(y_pred_mask, y_true_mask, reduction="none")
         return torch.sqrt(loss.mean())
 
-class MaskedPCCL1Loss(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.l1_loss = MaskedL1Loss()
-        self.pcc_loss = MaskedPearsonLoss()
-        self.pearson_perf = MaskedPearsonCorr()
-
-    def __call__(self, y_pred, y_true, mask):
-        '''
-        loss is the sum of the l1 loss and the pearson correlation coefficient loss
-        '''
-
-        l1 = self.l1_loss(y_pred, y_true, mask)
-        pcc = self.pcc_loss(y_pred, y_true, mask)
-        perf = self.pearson_perf(y_pred, y_true, mask)
-
-        return l1 + pcc, perf, l1
-    
 class MaskedPearsonCorr(nn.Module):
     def __init__(self):
         super().__init__()
@@ -205,31 +193,52 @@ class MaskedPearsonCorr(nn.Module):
             y_true_mask - y_true_mask.mean(),
         )
 
+class MaskedPCCL1Loss(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.l1_loss = MaskedL1Loss()
+        self.pcc_loss = MaskedPearsonLoss()
+        self.pearson_perf = MaskedPearsonCorr()
+
+    def __call__(self, y_pred, y_true, mask, condition_):
+        '''
+        loss is the sum of the l1 loss and the pearson correlation coefficient loss
+        '''
+
+        l1 = self.l1_loss(y_pred, y_true, mask)
+        pcc = self.pcc_loss(y_pred, y_true, mask)
+        perf = self.pearson_perf(y_pred, y_true, mask)
+
+        return l1 + pcc, perf, l1
+
 class LSTM(L.LightningModule):
-    def __init__(self, dropout_val, num_epochs, bs, lr):
+    def __init__(self, dropout_val, num_epochs, bs, lr, num_layers, num_nodes):
         super().__init__()
 
-        self.bilstm = nn.LSTM(128, 128, num_layers = 4, bidirectional=True)
-        self.embedding = nn.Embedding(65, 128)
-        self.linear = nn.Linear(256, 1)
+        self.bilstm = nn.LSTM(num_nodes, num_nodes, num_layers = num_layers, bidirectional=True)
+        self.embedding = nn.Embedding(71, num_nodes)
+        self.linear = nn.Linear(num_nodes * 2, 1) # combined single head
         
         self.relu = nn.ReLU()
-        self.softmax = nn.Softmax(dim=0)
         
+        # self.loss = MaskedCombinedFiveDH()
         self.loss = MaskedPCCL1Loss()
         self.perf = MaskedPearsonCorr()
 
         self.lr = lr
         self.bs = bs
+        self.num_layers = num_layers
+        self.num_nodes = num_nodes
         self.num_epochs = num_epochs
         self.perf_list = []
         self.mae_list = []
+        self.conds_list = []
         self.out_tr = []
 
     def forward(self, x):
         # bilstm final layer
-        h_0 = Variable(torch.zeros(8, 1, 128).cuda()) # (1, bs, hidden)
-        c_0 = Variable(torch.zeros(8, 1, 128).cuda()) # (1, bs, hidden)
+        h_0 = Variable(torch.zeros(self.num_layers*2, 1, self.num_nodes).cuda()) # (1, bs, hidden)
+        c_0 = Variable(torch.zeros(self.num_layers*2, 1, self.num_nodes).cuda()) # (1, bs, hidden)
 
         # switch dims for lstm
         x = self.embedding(x)
@@ -241,35 +250,38 @@ class LSTM(L.LightningModule):
 
         # linear out
         x = self.linear(x)
-        x = x.squeeze(dim=1)
-        
-        # extra for lstm
         out = x.squeeze(dim=1)
 
         return out
     
     def _get_loss(self, batch):
         # get features and labels
-        x, y = batch
+        x, y, g, t, c = batch
 
         y = y.squeeze(dim=0)
 
         # pass through model
         y_pred = self.forward(x)
 
-        # add dims
+        # remove the first dim of y_pred
+        y_pred = y_pred[1:, :]
 
-        # calculate loss
-        lengths = torch.tensor([y.shape[0]]).to(y_pred)
-        mask = torch.arange(y_pred.shape[0])[None, :].to(lengths) < lengths[:, None]
-        mask = torch.logical_and(mask, torch.logical_not(torch.isnan(y)))
+        # condition
+        condition_ = x[0].item()
+
+        # calculate masks
+        lengths_full = torch.tensor([y.shape[0]]).to(y_pred)
+        mask_full = torch.arange(y_pred.shape[0])[None, :].to(lengths_full) < lengths_full[:, None]
+        mask_full = torch.logical_and(mask_full, torch.logical_not(torch.isnan(y)))
 
         # squeeze mask
-        mask = mask.squeeze(dim=0)
+        mask_full = mask_full.squeeze(dim=0)
 
-        loss, perf, mae = self.loss(y_pred, y, mask)
+        y_pred = torch.squeeze(y_pred, dim=1)
 
-        return loss, perf, mae
+        loss, perf, mae = self.loss(y_pred, y, mask_full, condition_)
+
+        return loss, perf, mae, c
 
     def configure_optimizers(self):
         optimizer = torch.optim.AdamW(self.parameters(), lr=self.lr)
@@ -278,7 +290,7 @@ class LSTM(L.LightningModule):
     
     def training_step(self, batch):
 
-        loss, perf, mae = self._get_loss(batch)
+        loss, perf, mae, c = self._get_loss(batch)
 
         self.log('train/loss', loss, batch_size=self.bs)
         self.log('train/r', perf, batch_size=self.bs)
@@ -286,7 +298,7 @@ class LSTM(L.LightningModule):
         return loss
     
     def validation_step(self, batch):
-        loss, perf, mae = self._get_loss(batch)
+        loss, perf, mae, c = self._get_loss(batch)
 
         self.log('eval/loss', loss)
         self.log('eval/r', perf)
@@ -294,14 +306,17 @@ class LSTM(L.LightningModule):
         return loss
     
     def test_step(self, batch):
-        loss, perf, mae = self._get_loss(batch)
+        loss, perf, mae, c = self._get_loss(batch)
 
         self.log('test/loss', loss)
         self.log('test/r', perf)
 
+        self.perf_list.append(perf.item())
+        self.conds_list.append(c)
+
         return loss
     
-def trainLSTM(num_epochs, bs, lr, save_loc, wandb_logger, train_loader, test_loader, dropout_val):
+def trainLSTM(num_epochs, bs, lr, save_loc, train_loader, test_loader, val_loader, dropout_val, num_layers, num_nodes, wandb_logger):
     # Create a PyTorch Lightning trainer with the generation callback
     trainer = L.Trainer(
         default_root_dir=save_loc,
@@ -322,15 +337,18 @@ def trainLSTM(num_epochs, bs, lr, save_loc, wandb_logger, train_loader, test_loa
     trainer.logger._default_hp_metric = None  # Optional logging argument that we don't need
 
     # Check whether pretrained model exists. If yes, load it and skip training
-    model = LSTM(dropout_val, num_epochs, bs, lr)
+    model = LSTM(dropout_val, num_epochs, bs, lr, num_layers, num_nodes)
+    pytorch_total_params = sum(p.numel() for p in model.parameters())
+    print("Total LSTM parameters: ", pytorch_total_params)
+
     # fit trainer
-    trainer.fit(model, train_dataloaders = train_loader, val_dataloaders = test_loader)
+    trainer.fit(model, train_dataloaders = train_loader, val_dataloaders = val_loader)
     # Test best model on test set
-    test_result = trainer.test(model, dataloaders=test_loader, verbose=False, ckpt_path="best")
+    test_result = trainer.test(model, dataloaders=test_loader, verbose=False)
     result = {"test": test_result}
 
-    # load model
-    # model = LSTM.load_from_checkpoint(save_loc+ '/epoch=7-step=39232.ckpt', dropout_val=dropout_val, num_epochs=num_epochs, bs=bs, lr=lr)
+    # # # # load model
+    # model = LSTM.load_from_checkpoint(save_loc+ '/epoch=2-step=53691.ckpt', dropout_val=dropout_val, num_epochs=num_epochs, bs=bs, lr=lr)
 
     # # Test best model on test set
     # test_result = trainer.test(model, dataloaders = test_loader, verbose=False)

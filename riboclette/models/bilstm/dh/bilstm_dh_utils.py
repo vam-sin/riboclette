@@ -102,13 +102,19 @@ def RiboDatasetGWSDepr(threshold: float = 0.6, longZerosThresh: int = 20, percNa
     Dataset generation function
     '''
     # save the dataframes
-    out_train_path = '../xlnet/data/dh/train_' + str(threshold) + '_NZ_' + str(longZerosThresh) + '_PercNan_' + str(percNansThresh) + '.csv'
-    out_test_path = '../xlnet/data/dh/test_' + str(threshold) + '_NZ_' + str(longZerosThresh) + '_PercNan_' + str(percNansThresh) + '.csv'
+    out_train_path = 'data/orig/train_' + str(threshold) + '_NZ_' + str(longZerosThresh) + '_PercNan_' + str(percNansThresh) + '.csv'
+    out_test_path = 'data/orig/test_' + str(threshold) + '_NZ_' + str(longZerosThresh) + '_PercNan_' + str(percNansThresh) + '.csv'
+    out_val_path = 'data/orig/val_' + str(threshold) + '_NZ_' + str(longZerosThresh) + '_PercNan_' + str(percNansThresh) + '.csv'
+
+    # out_train_path = '../../data/orig/train_' + str(threshold) + '_NZ_' + str(longZerosThresh) + '_PercNan_' + str(percNansThresh) + '.csv'
+    # out_test_path = '../../data/orig/test_' + str(threshold) + '_NZ_' + str(longZerosThresh) + '_PercNan_' + str(percNansThresh) + '.csv'
+    # out_val_path = '../../data/orig/val_' + str(threshold) + '_NZ_' + str(longZerosThresh) + '_PercNan_' + str(percNansThresh) + '.csv'
 
     df_train = pd.read_csv(out_train_path)
+    df_val = pd.read_csv(out_val_path)
     df_test = pd.read_csv(out_test_path)
 
-    return df_train, df_test
+    return df_train, df_val, df_test
 
 class GWSDatasetFromPandas(Dataset):
     def __init__(self, df):
@@ -164,8 +170,9 @@ class GWSDatasetFromPandas(Dataset):
 
         gene = self.df['gene'].iloc[idx]
         transcript = self.df['transcript'].iloc[idx]
+        condition = self.df['condition'].iloc[idx]
 
-        return X, y, ctrl_y, gene, transcript
+        return X, y, ctrl_y, gene, transcript, condition
 
 class MaskedPearsonLoss(nn.Module):
     def __init__(self):
@@ -228,31 +235,66 @@ class MaskedCombinedFiveDH(nn.Module):
         l1 = self.l1(y_pred_full, labels, mask_full)
 
         return loss_ctrl + loss_depr_diff + loss_full, perf, l1
+    
+class MaskedCombinedFourDH(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.pearson = MaskedPearsonLoss()
+        self.l1 = MaskedL1Loss()
+        self.pearson_perf = MaskedPearsonCorr()
+    
+    def __call__(self, y_pred, labels, labels_ctrl, mask_full, mask_ctrl, condition_):
+        # remove the first output cause that corresponds to the condition token
+        y_pred_ctrl = y_pred[:, 0]
+        y_pred_depr_diff = y_pred[:, 1]
+        y_pred_full = torch.sum(y_pred, dim=1)
+
+        labels_diff = labels - labels_ctrl
+
+        # combine masks to make mask diff 
+        mask_diff = mask_full & mask_ctrl
+
+        loss_ctrl = self.pearson(y_pred_ctrl, labels_ctrl, mask_ctrl) 
+        if condition_ != 64:
+            loss_depr_diff = self.pearson(y_pred_depr_diff, labels_diff, mask_diff)
+        loss_full = self.pearson(y_pred_full, labels, mask_full) + self.l1(y_pred_full, labels, mask_full)
+
+        perf = self.pearson_perf(y_pred_full, labels, mask_full)
+        l1 = self.l1(y_pred_full, labels, mask_full)
+
+        if condition_ != 64:
+            return loss_ctrl + loss_depr_diff + loss_full, perf, l1
+        else:
+            return loss_ctrl + loss_full, perf, l1
 
 class LSTM(L.LightningModule):
-    def __init__(self, dropout_val, num_epochs, bs, lr):
+    def __init__(self, dropout_val, num_epochs, bs, lr, num_layers, num_nodes):
         super().__init__()
 
-        self.bilstm = nn.LSTM(128, 128, num_layers = 4, bidirectional=True)
-        self.embedding = nn.Embedding(71, 128)
-        self.linear = nn.Linear(256, 2) # double head
+        self.bilstm = nn.LSTM(num_nodes, num_nodes, num_layers = num_layers, bidirectional=True)
+        self.embedding = nn.Embedding(71, num_nodes)
+        self.linear = nn.Linear(num_nodes * 2, 2) # double head
         
         self.relu = nn.ReLU()
         
-        self.loss = MaskedCombinedFiveDH()
+        # self.loss = MaskedCombinedFiveDH()
+        self.loss = MaskedCombinedFourDH()
         self.perf = MaskedPearsonCorr()
 
         self.lr = lr
         self.bs = bs
+        self.num_layers = num_layers
+        self.num_nodes = num_nodes
         self.num_epochs = num_epochs
         self.perf_list = []
         self.mae_list = []
+        self.conds_list = []
         self.out_tr = []
 
     def forward(self, x):
         # bilstm final layer
-        h_0 = Variable(torch.zeros(8, 1, 128).cuda()) # (1, bs, hidden)
-        c_0 = Variable(torch.zeros(8, 1, 128).cuda()) # (1, bs, hidden)
+        h_0 = Variable(torch.zeros(self.num_layers*2, 1, self.num_nodes).cuda()) # (1, bs, hidden)
+        c_0 = Variable(torch.zeros(self.num_layers*2, 1, self.num_nodes).cuda()) # (1, bs, hidden)
 
         # switch dims for lstm
         x = self.embedding(x)
@@ -270,7 +312,7 @@ class LSTM(L.LightningModule):
     
     def _get_loss(self, batch):
         # get features and labels
-        x, y, ctrl_y, g, t = batch
+        x, y, ctrl_y, g, t, c = batch
 
         y = y.squeeze(dim=0)
 
@@ -280,7 +322,8 @@ class LSTM(L.LightningModule):
         # remove the first dim of y_pred
         y_pred = y_pred[1:, :]
 
-        # add dims
+        # condition
+        condition_ = x[0].item()
 
         # calculate masks
         lengths_full = torch.tensor([y.shape[0]]).to(y_pred)
@@ -296,9 +339,9 @@ class LSTM(L.LightningModule):
         mask_full = mask_full.squeeze(dim=0)
         mask_ctrl = mask_ctrl.squeeze(dim=0)
 
-        loss, perf, mae = self.loss(y_pred, y, ctrl_y, mask_full, mask_ctrl)
+        loss, perf, mae = self.loss(y_pred, y, ctrl_y, mask_full, mask_ctrl, condition_)
 
-        return loss, perf, mae
+        return loss, perf, mae, c
 
     def configure_optimizers(self):
         optimizer = torch.optim.AdamW(self.parameters(), lr=self.lr)
@@ -307,7 +350,7 @@ class LSTM(L.LightningModule):
     
     def training_step(self, batch):
 
-        loss, perf, mae = self._get_loss(batch)
+        loss, perf, mae, c = self._get_loss(batch)
 
         self.log('train/loss', loss, batch_size=self.bs)
         self.log('train/r', perf, batch_size=self.bs)
@@ -315,7 +358,7 @@ class LSTM(L.LightningModule):
         return loss
     
     def validation_step(self, batch):
-        loss, perf, mae = self._get_loss(batch)
+        loss, perf, mae, c = self._get_loss(batch)
 
         self.log('eval/loss', loss)
         self.log('eval/r', perf)
@@ -323,21 +366,17 @@ class LSTM(L.LightningModule):
         return loss
     
     def test_step(self, batch):
-        loss, perf, mae = self._get_loss(batch)
+        loss, perf, mae, c = self._get_loss(batch)
 
         self.log('test/loss', loss)
         self.log('test/r', perf)
 
         self.perf_list.append(perf.item())
-
-        if len(self.perf_list) == 4252:
-            # save perf list 
-            df = pd.DataFrame(self.perf_list)
-            df.to_csv('perf_list.csv')
+        self.conds_list.append(c)
 
         return loss
     
-def trainLSTM(num_epochs, bs, lr, save_loc, wandb_logger, train_loader, test_loader, dropout_val):
+def trainLSTM(num_epochs, bs, lr, save_loc, train_loader, test_loader, val_loader, dropout_val, num_layers, num_nodes, wandb_logger):
     # Create a PyTorch Lightning trainer with the generation callback
     trainer = L.Trainer(
         default_root_dir=save_loc,
@@ -358,19 +397,21 @@ def trainLSTM(num_epochs, bs, lr, save_loc, wandb_logger, train_loader, test_loa
     trainer.logger._default_hp_metric = None  # Optional logging argument that we don't need
 
     # Check whether pretrained model exists. If yes, load it and skip training
-    # model = LSTM(dropout_val, num_epochs, bs, lr)
+    model = LSTM(dropout_val, num_epochs, bs, lr, num_layers, num_nodes)
+    pytorch_total_params = sum(p.numel() for p in model.parameters())
+    print("Total LSTM parameters: ", pytorch_total_params)
     # fit trainer
-    # trainer.fit(model, train_dataloaders = train_loader, val_dataloaders = test_loader)
-    # # Test best model on test set
-    # test_result = trainer.test(model, dataloaders=test_loader, verbose=False, ckpt_path="best")
-    # result = {"test": test_result}
-
-    # load model
-    model = LSTM.load_from_checkpoint(save_loc+ '/epoch=2-step=53691.ckpt', dropout_val=dropout_val, num_epochs=num_epochs, bs=bs, lr=lr)
-
+    trainer.fit(model, train_dataloaders = train_loader, val_dataloaders = val_loader)
     # Test best model on test set
-    test_result = trainer.test(model, dataloaders = test_loader, verbose=False)
+    test_result = trainer.test(model, dataloaders=test_loader, verbose=False)
     result = {"test": test_result}
+
+    # # # # load model
+    # model = LSTM.load_from_checkpoint(save_loc+ '/epoch=2-step=53691.ckpt', dropout_val=dropout_val, num_epochs=num_epochs, bs=bs, lr=lr)
+
+    # # Test best model on test set
+    # test_result = trainer.test(model, dataloaders = test_loader, verbose=False)
+    # result = {"test": test_result}
 
     return model, result
     
