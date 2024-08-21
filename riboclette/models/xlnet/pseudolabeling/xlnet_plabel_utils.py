@@ -291,9 +291,9 @@ def ntseqtoCodonSeq(seq):
 
 def RiboDatasetExp1(threshold: float = 0.3, longZerosThresh: int = 20, percNansThresh: float = 0.05):
     # load training and testing original sets
-    out_train_path = '../data/plabel/train_exp1.csv'
-    df_test_orig = pd.read_csv('../data/dh/test_0.3_NZ_20_PercNan_0.05.csv')
-    df_val_orig = pd.read_csv('../data/dh/val_0.3_NZ_20_PercNan_0.05.csv')
+    out_train_path = '../../data/plabel/train_exp1.csv'
+    df_test_orig = pd.read_csv('../../data/orig/test_0.3_NZ_20_PercNan_0.05.csv')
+    df_val_orig = pd.read_csv('../../data/orig/val_0.3_NZ_20_PercNan_0.05.csv')
     
     # check if the file exists
     if os.path.exists(out_train_path):
@@ -307,7 +307,7 @@ def RiboDatasetExp1(threshold: float = 0.3, longZerosThresh: int = 20, percNansT
     orig_val_transcripts = list(set(list(df_val_orig['transcript'])))
 
     # predictions paths
-    exp1_preds_path = '../data/plabel/exp1_preds.pkl'
+    exp1_preds_path = '../../data/plabel/exp1_preds.pkl'
     # load preds files
     exp1_preds = pd.read_pickle(exp1_preds_path)
 
@@ -396,9 +396,9 @@ def RiboDatasetExp1(threshold: float = 0.3, longZerosThresh: int = 20, percNansT
     return exp1_preds, df_val_orig, df_test_orig
 
 def RiboDatasetExp2(threshold: float = 0.3, longZerosThresh: int = 20, percNansThresh: float = 0.05):
-    out_train_path = '../data/plabel/train_exp2.csv'
-    df_test_orig = pd.read_csv('../data/dh/test_0.3_NZ_20_PercNan_0.05.csv')
-    df_val_orig = pd.read_csv('../data/dh/val_0.3_NZ_20_PercNan_0.05.csv')
+    out_train_path = '../../data/plabel/train_exp2.csv'
+    df_test_orig = pd.read_csv('../../data/orig/test_0.3_NZ_20_PercNan_0.05.csv')
+    df_val_orig = pd.read_csv('../../data/orig/val_0.3_NZ_20_PercNan_0.05.csv')
 
     # check if the file exists
     if os.path.exists(out_train_path):
@@ -414,7 +414,7 @@ def RiboDatasetExp2(threshold: float = 0.3, longZerosThresh: int = 20, percNansT
     orig_val_transcripts = list(set(list(df_val_orig['transcript'])))
 
     # predictions paths
-    exp2_preds_path = '../data/plabel/exp2_preds.pkl'
+    exp2_preds_path = '../../data/plabel/exp2_preds.pkl'
     # load preds files
     exp2_preds = pd.read_pickle(exp2_preds_path)
 
@@ -496,7 +496,7 @@ def RiboDatasetExp2(threshold: float = 0.3, longZerosThresh: int = 20, percNansT
     print("Sanity Checked")
 
     # merge exp1 samples
-    exp_1_train_path = '../data/plabel/train_exp1.csv'
+    exp_1_train_path = '../../data/plabel/train_exp1.csv'
 
     exp1_train = pd.read_csv(exp_1_train_path)
 
