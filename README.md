@@ -4,6 +4,19 @@ Riboclette is a transformer-based deep learning model that is capable of predict
 
 ## Dataset Preparation 🐁
 
+Download the raw data files from "link" and run the Ribo-DT pipeline to pre-process them.
+
+```
+- RiboDT
+```
+
+Convert the pre-processed data into a format the machine learning models can use
+
+```
+cd /riboclette/preprocessing
+papermill processing.ipynb
+```
+
 ## Riboclette Model Training 💻
 
 Combined Single-Head Variant
@@ -46,6 +59,8 @@ After the Pseudolabeling datasets have been generated, the different psuedolabel
 cd /riboclette/models/xlnet/pseudolabeling
 papermill xlnet_plabel_train.ipynb -p experiment_type [exp1, exp2]
 ```
+
+### Interpretability
 
 In order to generate codon-level interpretations for all the sequences in the testing set, run the following commands:
 
