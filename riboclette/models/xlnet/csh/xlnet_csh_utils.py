@@ -96,31 +96,32 @@ def uniqueGenes(df):
 
     return df
 
-def RiboDatasetGWSDepr(threshold: float = 0.6, longZerosThresh: int = 20, percNansThresh: float = 0.1, cond: str = 'LEU'):
+def RiboDatasetGWSDepr(threshold: float = 0.6, longZerosThresh: int = 20, percNansThresh: float = 0.1):
     '''
     Dataset generation function
     '''
     # save the dataframes
-    out_train_path = 'data/dh/train_' + str(threshold) + '_NZ_' + str(longZerosThresh) + '_PercNan_' + str(percNansThresh) + '.csv'
-    out_test_path = 'data/dh/test_' + str(threshold) + '_NZ_' + str(longZerosThresh) + '_PercNan_' + str(percNansThresh) + '.csv'
+    out_train_path = '../../data/orig/train_' + str(threshold) + '_NZ_' + str(longZerosThresh) + '_PercNan_' + str(percNansThresh) + '.csv'
+    out_test_path = '../../data/orig/test_' + str(threshold) + '_NZ_' + str(longZerosThresh) + '_PercNan_' + str(percNansThresh) + '.csv'
+    out_val_path = '../../data/orig/val_' + str(threshold) + '_NZ_' + str(longZerosThresh) + '_PercNan_' + str(percNansThresh) + '.csv'
+
+    # out_train_path = 'data/orig/train_' + str(threshold) + '_NZ_' + str(longZerosThresh) + '_PercNan_' + str(percNansThresh) + '.csv'
+    # out_test_path = 'data/orig/test_' + str(threshold) + '_NZ_' + str(longZerosThresh) + '_PercNan_' + str(percNansThresh) + '.csv'
+    # out_val_path = 'data/orig/val_' + str(threshold) + '_NZ_' + str(longZerosThresh) + '_PercNan_' + str(percNansThresh) + '.csv'
 
     df_train = pd.read_csv(out_train_path)
     df_test = pd.read_csv(out_test_path)
+    df_val = pd.read_csv(out_val_path)
 
-    # choose the conditions
-    df_train = df_train[df_train['condition'] == cond]
-    df_test = df_test[df_test['condition'] == cond]
-
-    return df_train, df_test
+    return df_train, df_val, df_test
 
 class GWSDatasetFromPandas(Dataset):
-    '''
-    converts dataset from pandas dataframe to pytorch dataset
-    '''
     def __init__(self, df):
         self.df = df
         self.counts = list(self.df['annotations'])
         self.sequences = list(self.df['sequence'])
+        self.condition_lists = list(self.df['condition'])
+        self.condition_values = {'CTRL': 64, 'ILE': 65, 'LEU': 66, 'LEU_ILE': 67, 'LEU_ILE_VAL': 68, 'VAL': 69}
 
     def __len__(self):
         return len(self.df)
@@ -136,20 +137,27 @@ class GWSDatasetFromPandas(Dataset):
         y = y[1:-1].split(', ')
         y = [float(i) for i in y]
 
-        # sliding window to make long zeros into nans
-        y = slidingWindowZeroToNan(y, window_size=30)
+        y = slidingWindowZeroToNan(y)
 
-        # min max scaling (Do not do this, this reduces the performance)
         y = [1+i for i in y]
         y = np.log(y)
 
         X = np.array(X)
+        # multiply X with condition value times 64 + 1
+        cond_token = self.condition_values[self.condition_lists[idx]]
+        
+        # prepend the condition token to X
+        X = np.insert(X, 0, cond_token)
+
         y = np.array(y)
 
         X = torch.from_numpy(X).long()
         y = torch.from_numpy(y).float()
 
-        return X, y
+        gene = self.df['gene'].iloc[idx]
+        transcript = self.df['transcript'].iloc[idx]
+
+        return X, y, gene, transcript
 
 class MaskedPearsonLoss(nn.Module):
     def __init__(self):
@@ -196,6 +204,7 @@ class RegressionTrainer(Trainer):
         outputs = model(**inputs)
         logits = outputs.logits
         logits = torch.squeeze(logits, dim=2)
+        logits = logits[:, 1:]
         lengths = inputs['lengths']
 
         loss_fnc = MaskedPCCL1Loss()
