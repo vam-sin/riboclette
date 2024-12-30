@@ -54,6 +54,9 @@ riboclette/models/xlnet/pseudolabeling/codon_optimization/study_windows.ipynb
 riboclette/models/xlnet/pseudolabeling/codon_optimization/window_beamSearch_fast.ipynb 
 riboclette/models/xlnet/pseudolabeling/codon_optimization/xlnet_plabel_utils.py
 riboclette/models/xlnet/pseudolabeling/codon_optimization/job_scripts
+riboclette/models/xlnet/pseudolabeling/codon_optimization/motif_bs_analysis_remStall.ipynb 
+riboclette/models/xlnet/pseudolabeling/codon_optimization/motif_caseStudy.ipynb
+riboclette/models/xlnet/pseudolabeling/codon_optimization/window_beamSearch_remStall.ipynb
 riboclette/models/xlnet/pseudolabeling/job_scripts 
 riboclette/models/xlnet/pseudolabeling/check_results_h5.ipynb
 riboclette/models/xlnet/pseudolabeling/model_outputs 
@@ -76,6 +79,7 @@ riboclette/models/xlnet/pseudolabeling/xlnet_plabel_tune_exp1.ipynb
 riboclette/models/xlnet/pseudolabeling/xlnet_plabel_tune_exp1.py 
 riboclette/models/xlnet/pseudolabeling/xlnet_plabel_tune_exp2.ipynb
 riboclette/models/xlnet/pseudolabeling/xlnet_plabel_tune_exp2.py
+riboclette/models/xlnet/pseudolabeling/interpret_plabel.ipynb
 
 riboclette/preprocessing/df_reps_sims 
 riboclette/preprocessing/instadeep.py 
