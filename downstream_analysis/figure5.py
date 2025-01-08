@@ -215,14 +215,14 @@ def _(
                     linewidth=.6,
                     zorder=1
                 )
-                ax.axvspan(asite - 0.5, asite + 0.5, color="red", alpha=0.1, linewidth=0, label="A-site")
+                ax.axvspan(asite - 0.5, asite + 0.5, color=config.ASITE_COL, alpha=0.2, linewidth=0, label="A-site")
                 ax.text(asite+0.1, -1, codons[asite], rotation=90, ha='center', va='bottom')
                 cond_idxs = np.where(np.isin(codons, cond_codons))[0]
                 cond_idxs = cond_idxs[(cond_idxs > asite - nup_cdn) & (cond_idxs < asite + ndown_cdn)]
                 legend_label="Depr. codon"
                 for cidx in cond_idxs: 
                     ax.axvspan(
-                        cidx - 0.5, cidx + 0.5, color="blue", linewidth=0, alpha=0.1, 
+                        cidx - 0.5, cidx + 0.5, color=config.DEPRCDN_COL, linewidth=0, alpha=0.2, 
                         label=legend_label)
                     legend_label=""
                     ax.text(cidx+0.1, -1, codons[cidx], rotation=90, ha='center', va='bottom')
@@ -240,7 +240,7 @@ def _(
                     _lines, _labels = ax.get_legend_handles_labels()
             sns.despine()
             fig.legend(_lines, _labels, ncol=5, bbox_to_anchor=(1,0), loc='center right', frameon=False)
-            fig.suptitle(f"{gene_symbol}, {config.CONDITIONS_FIXNAME[condition]}", fontsize=config.FSB)
+            fig.suptitle(f"{gene_symbol} - {config.CONDITIONS_FIXNAME[condition]}", fontsize=config.FSB)
             fig.align_ylabels()
             fig.supxlabel('Pos in CDS')
             plt.savefig(
