@@ -36,16 +36,28 @@ SAVEFIG_KWARGS = dict(dpi=600, bbox_inches="tight", pad_inches=0.0)
 
 CONDITIONS_FIXNAME = {
         'CTRL': 'CTRL',
-        'VAL': 'VAL (V)',
-        'ILE': 'ILE (I)',
-        'LEU': 'LEU (L)',
+        'VAL': 'VAL',
+        'ILE': 'ILE',
+        'LEU': 'LEU',
         'LEU_ILE': '(L, I)', 
         'LEU_ILE_VAL': '(L, I, V)'}
 
 def rgb_to_rgb01(rgb: tuple[int]):
     return tuple([c / 255 for c in rgb])
 
+# Colors
+ATTR_COL = rgb_to_rgb01((230,159,0))
+TRUE_COL = rgb_to_rgb01((0,114,178))
+PRED_COL = rgb_to_rgb01((0,158,115))
+ASITE_COL = rgb_to_rgb01((213,94,0))
+DEPRCDN_COL = rgb_to_rgb01((0,114,178))
 
-ATTR_COL = rgb_to_rgb01((253, 180, 98))
-TRUE_COL = rgb_to_rgb01((128, 177, 211))
-PRED_COL = rgb_to_rgb01((141, 211, 199))
+COND_COL = dict(
+  CTRL=rgb_to_rgb01((230,159,0)),
+  VAL=rgb_to_rgb01((0,114,178)),
+  ILE=rgb_to_rgb01((240,228,66)),
+  LEU=rgb_to_rgb01((204,121,167)),
+  LIV=rgb_to_rgb01((213,94,0)),
+  LI=rgb_to_rgb01((10,70,0,0))
+)
+
