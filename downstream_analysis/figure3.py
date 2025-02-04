@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.10.9"
+__generated_with = "0.10.19"
 app = marimo.App(width="full")
 
 
@@ -13,19 +13,21 @@ def _():
     import scienceplots
     import itertools
     from adjustText import adjust_text
-    from scipy.stats import pearsonr
+    from scipy.stats import pearsonr, spearmanr
     import marsilea as ma
     import palettable
     import matplotlib as mpl
     import config
     import utils
     from pyhere import here
+    import marimo as mo
     return (
         adjust_text,
         config,
         here,
         itertools,
         ma,
+        mo,
         mpl,
         np,
         palettable,
@@ -33,34 +35,14 @@ def _():
         pearsonr,
         plt,
         scienceplots,
+        spearmanr,
         utils,
     )
 
 
 @app.cell
 def _():
-    TEXTWIDTH_CM = 18.3
-    CM_TO_INCH = 1/2.54  # centimeters in inches
-    CONDITION_ORDER = ['CTRL', 'ILE (I)', 'LEU (L)', 'VAL (V)', '(L, I)', '(L, I, V)']
-    return CM_TO_INCH, CONDITION_ORDER, TEXTWIDTH_CM
-
-
-@app.cell
-def _(here, np):
-    ctrl_data = np.load(here("data/results/plotting/globl_attr_plot_True.npy"))
-    dd_data = np.load(here("data/results/plotting/globl_attr_plot_False.npy"))
-    return ctrl_data, dd_data
-
-
-@app.cell
-def _(dd_data):
-    dd_data
-    return
-
-
-@app.cell
-def _():
-    def global_attr_plot(ax,data, title:str, xlabel=False, ylabel=False, yticks=False, xticks=False):
+    def global_attr_plot(ax, data, title:str, xlabel=False, ylabel=False, yticks=False, xticks=False):
         ax.hist(data, bins=21, color='#e74c3c', edgecolor='#ffffff', linewidth=1, range=(-10, 10), density=True)
         ax.axvline(0, color='black', linestyle='--', linewidth=1)
         if xticks: ax.set_xticks([-10, -4.75, 0, 4.75, 10], [-10, -5, 'A', 5, 10])
@@ -102,7 +84,8 @@ def _(adjust_text, config, itertools, np, pearsonr):
         condition_codon_stall_mean_sorted,
         condition_codon_attr_peaks_mean_sorted,
         condition_codon_attr_full_mean_sorted,
-        mode='peaks'
+        mode='peaks',
+        conditions=['CTRL', 'ILE', 'VAL']
     ):
 
         # Get the codons for each deprivation condition
@@ -133,7 +116,7 @@ def _(adjust_text, config, itertools, np, pearsonr):
             condition_codon_attr_full_mean_sorted
         )
 
-        for i, condition in enumerate(['CTRL', 'ILE', 'VAL']):#enumerate(depr_codons.keys()):
+        for i, condition in enumerate(conditions):#enumerate(depr_codons.keys()):
             texts = []
             texts = plot_condition(
                 axs[i],
@@ -168,36 +151,30 @@ def _(adjust_text, config, itertools, np, pearsonr):
 
             #axs[i].set_xlabel('Mean Ribosome Counts')
             if i == 0: axs[i].set_ylabel('Mean Attribution',labelpad=-2)
-            c_text = (
-                'LEU + ILE' if condition == 'LEU_ILE' else
-                'LEU + ILE + VAL' if condition == 'LEU_ILE_VAL' else
-                condition
-            )
+            c_text = config.CONDITIONS_FIXNAME[condition]
             axs[i].set_title(f"{c_text} (PCC: {corr:.2f})")
             axs[i].tick_params(axis='both', which='major')
     return global_stalling, plot_condition
 
 
 @app.cell
-def _(config, ma, np, plt):
+def _(config):
+    config.CONDITIONS_FIXNAME
+    return
+
+
+@app.cell
+def _(config, ma):
     def topk_attributions(data, genetic_code, width: float, height=float, fontsizes: list[int] = [5,6,7]):
-        AA = ['Val', 'Ile', 'Leu', 'Lys', 'Asn', 'Thr', 'Arg', 'Ser', 'Met', 'Gln', 'His', 'Pro', 'Glu', 'Asp', 'Ala', 'Gly', 'Tyr', 'Cys', 'Trp', 'Phe']
-        AA_corr = [config.AMINO_ACID_MAP[a] for a in AA]
-        DEPR_NAMES = {'CTRL':'CTRL', 'ILE':'ILE (I)', 'LEU':'LEU (L)', 'VAL':'VAL (V)', 'LEU_ILE':'(L, I)', 'LEU_ILE_VAL':'(L,I,V)'}
 
-        data = data.rename(columns=DEPR_NAMES)[DEPR_NAMES.values()]
+        data = data.rename(columns=config.CONDITIONS_FIXNAME)[config.CONDITIONS_FIXNAME.values()]
         h = ma.Heatmap(data.T, width=width, height=height, cmap='RdBu_r', cbar_kws=dict(title="Normalized Mean Attribution", orientation="horizontal", height=1.5, fontsize=config.FSS, width=12, title_fontproperties=dict(weight='normal', size=config.FSM)))
-
-        cmap = plt.get_cmap('tab20c')
-        colors = np.array(cmap.colors)
-        np.random.seed(42)
-        np.random.shuffle(colors)
-
+        AA = config.AMINO_ACID_MAP.keys()
         h.group_cols(genetic_code.AminoAcid, spacing=0.002, order=AA)
         h.add_top(
                 ma.plotter.Chunk(
-                    AA_corr,
-                    colors[:len(AA_corr)],
+                    [config.AMINO_ACID_MAP[a] for a in AA],
+                    [config.AMINO_ACID_COLORS[a] for a in AA],
                     #padding=10,
                 ),
                 pad=0.025
@@ -224,32 +201,42 @@ def _(config, ma, np, plt):
 
 
 @app.cell
+def _(mo):
+    mo.md(r"""# Attributions panel""")
+    return
+
+
+@app.cell
 def _(
     config,
-    ctrl_data,
-    dd_data,
     global_attr_plot,
     global_stalling,
     here,
+    mo,
     mpl,
+    np,
     pd,
     plt,
     utils,
 ):
-    with plt.style.context(['grid', 'nature', 'no-latex']), utils.journal_plotting_ctx():
+    def _():
         corrected_width = config.TEXTWIDTH_CM + 3.75
         aspect_ratio = 6
+
         fig = plt.figure(figsize=(corrected_width * config.CM_TO_INCH, corrected_width / aspect_ratio * config.CM_TO_INCH))
         gs = fig.add_gridspec(nrows=1, ncols=5, wspace=0.6, hspace=3)
         sub_gs = gs[0, :2].subgridspec(1, 2, wspace=0.1)
         ax = fig.add_subplot(sub_gs[0, 0])
         ax.text(-0.3, 1.1, "a", transform=ax.transAxes, fontsize=8)
+        ctrl_data = np.load(here("data/results/plotting/globl_attr_plot_True.npz"))['CTRL']
+        dd_data = np.load(here("data/results/plotting/globl_attr_plot_False.npz"))
         global_attr_plot(ax, ctrl_data, title='Control', ylabel=True, yticks=True, xticks=True)
         ax = fig.add_subplot(sub_gs[0, 1], sharex=ax, sharey=ax)
-        global_attr_plot(ax, dd_data, title='Deprivation Difference', yticks=False, xticks=True)
+        global_attr_plot(ax, np.concatenate([dd_data[k] for k in dd_data.keys() if k != "CTRL"]), title='Deprivation Difference', yticks=False, xticks=True)
         plt.tick_params('y', labelleft=False)
         subfig_coords = sub_gs.get_grid_positions(fig)
         ax.text(subfig_coords[2][1] - 0.02, subfig_coords[0] - 0.22, 'Codon Distance from A-site', transform=fig.transFigure, ha='center', fontsize=config.FSM)
+
         sub_gs = gs[0, 2:].subgridspec(1, 3, wspace=0.1)
         axs = [fig.add_subplot(sub_gs[row, col]) for row in range(1) for col in range(0, 3)]
         _genetic_code = pd.read_csv(here('data', 'data', 'genetic_code.csv'))
@@ -265,42 +252,30 @@ def _(
             ax.set_yticklabels([])
         legend_elements = [mpl.lines.Line2D([0], [0], marker='o', color='w', label='CTRL', markerfacecolor=config.COND_COL['CTRL'], markersize=5), mpl.lines.Line2D([0], [0], marker='o', color='w', label='ILE', markerfacecolor=config.COND_COL['ILE'], markersize=5), mpl.lines.Line2D([0], [0], marker='o', color='w', label='LEU', markerfacecolor=config.COND_COL['LEU'], markersize=5), mpl.lines.Line2D([0], [0], marker='o', color='w', label='VAL', markerfacecolor=config.COND_COL['VAL'], markersize=5), mpl.lines.Line2D([0], [0], marker='o', color='w', label='Other', markerfacecolor='black', markersize=5)]
         axs[1].legend(handles=legend_elements, loc='center', ncols=5, bbox_to_anchor=(0.5, -0.4), frameon=False)
-        plt.savefig(here('data', 'results', 'figures', 'figure3_1.svg'), **config.SAVEFIG_KWARGS)
-    return (
-        aspect_ratio,
-        ax,
-        axs,
-        condition_codon_attr_full_mean_sorted,
-        condition_codon_attr_peaks_mean_sorted,
-        condition_codon_stall_mean_sorted,
-        corrected_width,
-        fig,
-        gs,
-        legend_elements,
-        sub_gs,
-        subfig_coords,
-    )
+        out_fpath = mo.cli_args().get("output_dirpath") or here('data', 'results', 'figures', 'figure3_1.svg')
+        plt.savefig(out_fpath, **config.SAVEFIG_KWARGS)
+        plt.show()
+
+    with plt.style.context(['grid', 'nature', 'no-latex']), utils.journal_plotting_ctx():
+        _()
+    return
 
 
 @app.cell
-def _(
-    CM_TO_INCH,
-    TEXTWIDTH_CM,
-    config,
-    here,
-    pd,
-    plt,
-    topk_attributions,
-    utils,
-):
-    data = pd.read_csv(here('data', 'results', 'plotting', 'topk_attr_condition_wise.zip'), index_col=0)
-    _genetic_code = pd.read_csv(config.GENCODE_FPATH, index_col=0)
-    _genetic_code = _genetic_code.set_index('Codon').drop(index=['TAA', 'TAG', 'TGA'])
-    with plt.style.context(['grid', 'nature', 'no-latex']), utils.journal_plotting_ctx():
-        f = topk_attributions(data=data.loc[_genetic_code.index], genetic_code=_genetic_code, width=(TEXTWIDTH_CM - 1) * CM_TO_INCH, height=1.8 * CM_TO_INCH)
+def _(config, here, mo, pd, plt, topk_attributions, utils):
+    def _():
+        data = pd.read_csv(here('data', 'results', 'plotting', 'topk_attr_condition_wise.zip'), index_col=0)
+        genetic_code = pd.read_csv(config.GENCODE_FPATH, index_col=0)
+        genetic_code = genetic_code.set_index('Codon').drop(index=['TAA', 'TAG', 'TGA'])
+        f = topk_attributions(data=data.loc[genetic_code.index], genetic_code=genetic_code, width=(config.TEXTWIDTH_CM - 1) * config.CM_TO_INCH, height=1.8 * config.CM_TO_INCH)
         plt.text(.05, .875, "c", transform=f.figure.transFigure, fontsize=8)
-        f.figure.savefig(here('data', 'results', 'figures', 'figure3_2.svg'), **config.SAVEFIG_KWARGS)
-    return data, f
+        out_fpath = mo.cli_args().get("output_dirpath") or here('data', 'results', 'figures', 'figure3_2.svg')
+        f.figure.savefig(out_fpath, **config.SAVEFIG_KWARGS)
+        plt.show()
+
+    with plt.style.context(['grid', 'nature', 'no-latex']), utils.journal_plotting_ctx():
+        _()
+    return
 
 
 @app.cell
@@ -310,7 +285,63 @@ def _(here, utils):
 
 
 @app.cell
-def _():
+def _(mo):
+    mo.md(r"""# Supplementary Figures""")
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""## Attribution vs RPF (supp)""")
+    return
+
+
+@app.cell
+def _(config, global_stalling, here, mo, mpl, pd, plt, utils):
+    def _():
+        corrected_width = config.TEXTWIDTH_CM * config.CM_TO_INCH * 3/5
+        aspect_ratio = 2.5
+        fig, axs = plt.subplots(1,3,figsize=(corrected_width, corrected_width / aspect_ratio), constrained_layout=True)
+        _genetic_code = pd.read_csv(here('data', 'data', 'genetic_code.csv'))
+        condition_codon_attr_full_mean_sorted = pd.read_csv(here('data', 'results', 'plotting', 'condition_codon_attr_full_mean_sorted.zip'), index_col=0).to_dict()
+        condition_codon_attr_peaks_mean_sorted = pd.read_csv(here('data', 'results', 'plotting', 'condition_codon_attr_peaks_mean_sorted.zip'), index_col=0).to_dict()
+        condition_codon_stall_mean_sorted = pd.read_csv(here('data', 'results', 'plotting', 'condition_codon_stall_mean_sorted.zip'), index_col=0).to_dict()
+        global_stalling(axs, genetic_code=_genetic_code, condition_codon_attr_full_mean_sorted=condition_codon_attr_full_mean_sorted, condition_codon_attr_peaks_mean_sorted=condition_codon_attr_peaks_mean_sorted, condition_codon_stall_mean_sorted=condition_codon_stall_mean_sorted, conditions=['LEU', 'LEU_ILE', 'LEU_ILE_VAL'])
+        axs[0].set_xlabel(r'Mean RPF Counts')
+        axs[1].set_xlabel(u'Mean \u0394RPF Counts')
+        axs[2].set_xlabel(u'Mean \u0394RPF Counts')
+        for ax in axs[1:]:
+            ax.set_yticklabels([])
+        legend_elements = [mpl.lines.Line2D([0], [0], marker='o', color='w', label='CTRL', markerfacecolor=config.COND_COL['CTRL'], markersize=5), mpl.lines.Line2D([0], [0], marker='o', color='w', label='ILE', markerfacecolor=config.COND_COL['ILE'], markersize=5), mpl.lines.Line2D([0], [0], marker='o', color='w', label='LEU', markerfacecolor=config.COND_COL['LEU'], markersize=5), mpl.lines.Line2D([0], [0], marker='o', color='w', label='VAL', markerfacecolor=config.COND_COL['VAL'], markersize=5), mpl.lines.Line2D([0], [0], marker='o', color='w', label='Other', markerfacecolor='black', markersize=5)]
+        axs[1].legend(handles=legend_elements, loc='center', ncols=5, bbox_to_anchor=(0.5, -0.4), frameon=False)
+        out_fpath = mo.cli_args().get("output_dirpath") or here('data', 'results', 'figures', 'supp_corr_attr_stall.svg')
+        plt.savefig(out_fpath, **config.SAVEFIG_KWARGS)
+        plt.show()
+
+    with plt.style.context(['grid', 'nature', 'no-latex']), utils.journal_plotting_ctx():
+        _()
+    return
+
+
+@app.cell
+def _(config, global_attr_plot, here, mo, np, plt, utils):
+    def _():
+        corrected_width = config.TEXTWIDTH_CM + 3.75
+        aspect_ratio = 6
+
+        fig, axes = plt.subplots(ncols=5, sharey=True, figsize=(corrected_width * config.CM_TO_INCH, corrected_width / aspect_ratio * config.CM_TO_INCH))
+        cond_dd_data = np.load(here("data/results/plotting/globl_attr_plot_False.npz"))
+        cond_iter = config.CONDITIONS_FIXNAME
+        cond_iter.pop('CTRL', None)
+        for i, (cond, cond_fix) in enumerate(cond_iter.items()):
+            ax = fig.add_subplot(axes[i])
+            global_attr_plot(ax, cond_dd_data[cond], title=cond_fix, yticks=False, xticks=True)
+        out_fpath = mo.cli_args().get("output_dirpath") or here('data', 'results', 'figures', 'supplementary', 'supp_attr_hist.pdf')
+        plt.savefig(out_fpath, **config.SAVEFIG_KWARGS)
+        plt.show()
+
+    with plt.style.context(['grid', 'nature', 'no-latex']), utils.journal_plotting_ctx():
+        _()
     return
 
 

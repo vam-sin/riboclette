@@ -61,7 +61,7 @@ def journal_plotting_ctx():
         plt.rc(
             "font", size=SMALL_SIZE, family="arial"
         )  # Default font sizes and family
-        plt.rc("axes", titlesize=BIGGER_SIZE, labelsize=SMALL_SIZE)  # Axes sizes
+        plt.rc("axes", titlesize=BIGGER_SIZE, labelsize=MEDIUM_SIZE)  # Axes sizes
         plt.rc("xtick", labelsize=SMALL_SIZE)  # Tick label sizes
         plt.rc("ytick", labelsize=SMALL_SIZE)
         plt.rc(

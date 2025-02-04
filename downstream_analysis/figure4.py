@@ -14,12 +14,11 @@ def _():
     import pandas as pd
     import scienceplots
     import matplotlib.pyplot as plt
-    from utils import get_pdf_dimensions_in_cm
     import marimo as mo
     import config
+    import utils
     return (
         config,
-        get_pdf_dimensions_in_cm,
         here,
         itertools,
         ma,
@@ -29,47 +28,8 @@ def _():
         plt,
         scienceplots,
         tqdm,
+        utils,
     )
-
-
-@app.cell
-def _(plt):
-    from contextlib import contextmanager
-
-    @contextmanager
-    def journal_plotting_ctx():
-        """
-        A context manager to temporarily apply specific plotting parameters for matplotlib.
-        """
-        # Save the current rcParams
-        original_rc = plt.rcParams.copy()
-
-        # Define the desired parameters
-        SMALL_SIZE = 5
-        MEDIUM_SIZE = 6
-        BIGGER_SIZE = 7
-
-        try:
-            # Apply the desired rc settings
-            plt.rc(
-                "font", size=SMALL_SIZE, family="arial"
-            )  # Default font sizes and family
-            plt.rc("axes", titlesize=BIGGER_SIZE, labelsize=SMALL_SIZE)  # Axes sizes
-            plt.rc("xtick", labelsize=SMALL_SIZE)  # Tick label sizes
-            plt.rc("ytick", labelsize=SMALL_SIZE)
-            plt.rc(
-                "legend", fontsize=SMALL_SIZE, title_fontsize=BIGGER_SIZE
-            )  # Legend sizes
-            plt.rc("figure", titlesize=BIGGER_SIZE)  # Figure title size
-            plt.rcParams["svg.fonttype"] = "none"  # SVG fonttype
-
-            # Yield control to the block of code
-            yield
-        finally:
-            # Restore original rcParams
-            plt.rcParams.update(original_rc)
-        return contextmanager, journal_plotting_ctx
-    return contextmanager, journal_plotting_ctx
 
 
 @app.cell
@@ -209,15 +169,14 @@ def _(mo):
 
 @app.cell
 def _(filled_motifs_df, id_to_codon, np):
-    exclude_conditions = ['LEU_ILE', 'LEU_ILE_VAL']
     agg_filled_motifs_df = (filled_motifs_df
      .assign(freq=lambda df: df.start_pos.apply(lambda x: len(x)))
      .groupby('condition', group_keys=False)
      .apply(lambda x: x.nlargest(10, 'freq'))
      .assign(filled_motif_codons=lambda df: df.filled_motif_codons.apply(lambda x: ' '.join([id_to_codon[key] for key in x])))
      .assign(bincount=lambda df: df.start_pos.apply(lambda x: np.bincount(np.array(x)+10, minlength=16)/len(x))))
-    agg_filled_motifs_df = agg_filled_motifs_df.query('not condition.isin(@exclude_conditions)')
-    return agg_filled_motifs_df, exclude_conditions
+    #agg_filled_motifs_df = agg_filled_motifs_df.query('not condition.isin(@exclude_conditions)')
+    return (agg_filled_motifs_df,)
 
 
 @app.cell
@@ -252,52 +211,40 @@ def _(agg_filled_motifs_df, np):
 
 
 @app.cell
-def _(agg_filled_motifs_df, config, here, ma, maape, np, plt, pos_freq):
+def _(
+    agg_filled_motifs_df,
+    config,
+    here,
+    ma,
+    maape,
+    np,
+    plt,
+    pos_freq,
+    utils,
+):
     from matplotlib.ticker import FuncFormatter, FixedLocator
-    _SMALL_SIZE = 5
-    _MEDIUM_SIZE = 6
-    _BIGGER_SIZE = 7
-    plt.rc('font', size=_SMALL_SIZE)
-    plt.rc('axes', titlesize=_BIGGER_SIZE)
-    plt.rc('axes', labelsize=_SMALL_SIZE)
-    plt.rc('xtick', labelsize=_SMALL_SIZE)
-    plt.rc('ytick', labelsize=_SMALL_SIZE)
-    plt.rc('legend', fontsize=_SMALL_SIZE, title_fontsize=_BIGGER_SIZE)
-    plt.rc('figure', titlesize=_BIGGER_SIZE)
-    plt.rc('font', family='arial')
-    plt.rcParams['svg.fonttype'] = 'none'
-    plt.rcParams["font.family"] = "Arial"
-    plt.rcParams["font.sans-serif"] = ["Arial"]
-    cmap = plt.get_cmap('Set3')
-    colors = np.array(cmap.colors)
-    fmt = FuncFormatter(lambda x, _: f'{x:.0%}')
-    cells_proportion = ma.plotter.SizedMesh(
-        pos_freq, 
-        color=maape, 
-        sizes=(0, 25), 
-        linewidth=0,
-        size_legend_kws=dict(title='% of occurrences', title_fontproperties=dict(weight='normal', size=config.FSM), fontsize=config.FSS, show_at=[0.25, 0.5, 0.75, 1], fmt=fmt, ncols=4), 
-        color_legend_kws=dict(title='MAAPE', orientation='horizontal', height=1.5, fontsize=config.FSS, title_fontproperties=dict(weight='normal', size=config.FSM)))
-    _h = ma.base.ClusterBoard(np.zeros(pos_freq.shape), width=1.4, height=3.5)
-    _h.add_layer(cells_proportion)
-    _h.add_left(ma.plotter.Labels(agg_filled_motifs_df.filled_motif_codons, align='center'))
-    _h.group_rows(agg_filled_motifs_df.condition)
-    conditions = agg_filled_motifs_df.condition.unique()
-    _h.add_left(ma.plotter.Chunk(conditions, fill_colors=[config.COND_COL[c] for c in conditions]), pad=0.05)
-    _h.add_top(ma.plotter.Labels(list(range(-10, -2)) + ['E', 'P', 'A'] + list(range(1, 6)), align='center', rotation=0))
-    _h.add_legends('bottom', align_stacks='center', align_legends='center', stack_by='col', pad=0.2)
-    _h.render()
-    plt.savefig(here('data', 'results', 'figures', f'figure4_filled_motif_pos.svg'), dpi=600, bbox_inches='tight', pad_inches=0.0)
-    plt.show()
-    return (
-        FixedLocator,
-        FuncFormatter,
-        cells_proportion,
-        cmap,
-        colors,
-        conditions,
-        fmt,
-    )
+    with utils.journal_plotting_ctx():
+        fmt = FuncFormatter(lambda x, _: f'{x:.0%}')
+        cells_proportion = ma.plotter.SizedMesh(
+            pos_freq, 
+            color=maape, 
+            sizes=(0, 25), 
+            linewidth=0,
+            cmap='Reds',
+            size_legend_kws=dict(title='% of occurrences', title_fontproperties=dict(weight='normal', size=config.FSM), fontsize=config.FSS, show_at=[0.25, 0.5, 0.75, 1], fmt=fmt, ncols=4), 
+            color_legend_kws=dict(title='MAAPE', orientation='horizontal', height=1.5, fontsize=config.FSS, title_fontproperties=dict(weight='normal', size=config.FSM)))
+        _h = ma.base.ClusterBoard(np.zeros(pos_freq.shape), width=1.4, height=5)
+        _h.add_layer(cells_proportion)
+        _h.add_left(ma.plotter.Labels(agg_filled_motifs_df.filled_motif_codons, align='center'))
+        _h.group_rows(agg_filled_motifs_df.condition)
+        conditions = agg_filled_motifs_df.condition.unique()
+        _h.add_left(ma.plotter.Chunk([config.CONDITIONS_FIXNAME[c] for c in conditions], fill_colors=[config.COND_COL[c] for c in conditions]), pad=0.05)
+        _h.add_top(ma.plotter.Labels(list(range(-10, -2)) + ['E', 'P', 'A'] + list(range(1, 6)), align='center', rotation=0))
+        _h.add_legends('bottom', align_stacks='center', align_legends='center', stack_by='col', pad=0.2)
+        _h.render()
+        plt.savefig(here('data', 'results', 'figures', f'motif_pos_heatmap.svg'), dpi=600, bbox_inches='tight', pad_inches=0.0)
+        plt.show()
+    return FixedLocator, FuncFormatter, cells_proportion, conditions, fmt
 
 
 @app.cell
@@ -372,30 +319,18 @@ def _(df, id_to_codon_1, tqdm):
 
 @app.cell
 def _(
-    codon_to_id_1,
     condition_wise_dfs,
     config,
     here,
     id_to_codon_1,
-    journal_plotting_ctx,
     ma,
     np,
     pd,
     plt,
+    utils,
 ):
-    colors_full = plt.cm.tab20c(np.linspace(0, 1, 64))
-    colors_aa = np.array(colors_full).repeat(2, 0)
-    np.random.seed(42)
-    np.random.shuffle(colors_aa)
-    max_motif_val = 28383
-    _SMALL_SIZE = 5
-    _MEDIUM_SIZE = 6
-    _BIGGER_SIZE = 7
-    with journal_plotting_ctx():
+    with utils.journal_plotting_ctx():
         for _c in ['CTRL', 'ILE', 'LEU', 'VAL', 'LEU_ILE', 'LEU_ILE_VAL']:
-            AA = ['Val', 'Ile', 'Leu', 'Lys', 'Asn', 'Thr', 'Arg', 'Ser', 'Met', 'Gln', 'His', 'Pro', 'Glu', 'Asp', 'Ala', 'Gly', 'Tyr', 'Cys', 'Trp', 'Phe', 'Stp']
-            AA_1 = ['V', 'I', 'L', 'K', 'N', 'T', 'R', 'S', 'M', 'Q', 'H', 'P', 'E', 'D', 'A', 'G', 'Y', 'C', 'W', 'F', 'S']
-            aa_3_1 = {AA[i]: AA_1[i] for i in range(len(AA))}
             _df_c = condition_wise_dfs[_c]
             _df_c = _df_c.drop(columns=['motif', 'perc_counts'])
             df_c_mat = _df_c.to_numpy()
@@ -411,51 +346,42 @@ def _(
             stack_data_thresh = stack_data_t / stack_data_t.sum(axis=0)
             square_side = 2
             _h = ma.Heatmap(stack_data_thresh.T, linewidth=0.5, width=square_side, height=square_side, cmap='Blues', label='Frequency', vmin=0, vmax=1, cbar_kws=dict(orientation='horizontal', height=1.5, title_fontproperties=dict(weight='normal', size=config.FSM), fontsize=config.FSS))
-            colors_set = [colors_full[codon_to_id_1[i]] for i in list(stack_data_thresh.index)]
+            
             genetic_code = pd.read_csv(config.GENCODE_FPATH, index_col=0).set_index('Codon')
-            genetic_code['AminoAcid_1'] = [aa_3_1[i] for i in genetic_code['AminoAcid']]
             genetic_code = genetic_code.loc[stack_data_thresh.index]
-            _h.group_cols(group=genetic_code.AminoAcid_1, order=list(set(genetic_code.AminoAcid_1)), spacing=0.007)
-            colors_aa_c = []
-            for _i in list(set(genetic_code.AminoAcid_1)):
-                colors_aa_c.append(colors_aa[AA_1.index(_i)])
-            _h.add_top(ma.plotter.Chunk(list(set(genetic_code.AminoAcid_1)), colors_aa_c, fontsize=_MEDIUM_SIZE), pad=0.025)
-            _h.add_bottom(ma.plotter.Labels(list(stack_data_thresh.index), fontsize=_SMALL_SIZE, rotation=45), name='Codon')
+            _aa_oneletter = [config.AMINO_ACID_MAP[_a] for _a in genetic_code.AminoAcid]
+            _aa_oneletter_order = np.unique(_aa_oneletter)
+            _h.group_cols(group=_aa_oneletter, order=_aa_oneletter_order, spacing=0.007)
+            _colors = [config.AMINO_ACID_COLORS[config.AMINO_ACID_MAP_r[_a]] for _a in _aa_oneletter_order]
+            _h.add_top(ma.plotter.Chunk(_aa_oneletter_order, _colors, fontsize=config.FSM), pad=0.025)
+            _h.add_bottom(ma.plotter.Labels(list(stack_data_thresh.index), fontsize=config.FSS, rotation=45), name='Codon')
             num_motifs_list = stack_data_t.sum(axis=0).values / 100
             for _i in range(21):
                 codon_counts = df_c_mat[:, _i]
                 num_non_dash = np.sum(codon_counts != '-')
                 num_motifs_list[_i] = num_non_dash * num_motifs_list[_i]
             num_motifs_list = np.log(num_motifs_list + 1)
-            cm = ma.plotter.ColorMesh(num_motifs_list.reshape(1, -1), cmap='Reds', vmin=0, vmax=np.log(max_motif_val), cbar_kws=dict(orientation='horizontal', title='Num. Motifs (log)', height=1.5, title_fontproperties=dict(weight='normal', size=config.FSM), fontsize=config.FSS))
+            cm = ma.plotter.ColorMesh(num_motifs_list.reshape(1, -1), cmap='Reds', vmin=0, vmax=11, cbar_kws=dict(orientation='horizontal', title='Num. Motifs (log)', height=1.5, title_fontproperties=dict(weight='normal', size=config.FSM), fontsize=config.FSS))
             _h.add_right(cm, pad=0.05, size=0.075)
             c_text = _c
             if _c == 'LEU_ILE':
-                c_text = 'LEU + ILE'
+                c_text = '(L, I)'
             if _c == 'LEU_ILE_VAL':
-                c_text = 'LEU + ILE + VAL'
-            _h.add_title(c_text, fontsize=_BIGGER_SIZE)
+                c_text = '(L, I, V)'
+            _h.add_title(c_text, fontsize=config.FSB)
             pos_labels_list = ['-10', '-9', '-8', '-7', '-6', '-5', '-4', '-3', 'E', 'P', 'A', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
-            _h.add_left(ma.plotter.Labels(list(pos_labels_list), fontsize=_SMALL_SIZE))
+            _h.add_left(ma.plotter.Labels(list(pos_labels_list), fontsize=config.FSS))
             if _c == 'CTRL':
                 _h.add_legends(pad=0.025)
             _h.render()
             plt.savefig(here('data', 'results', 'figures', f'figure4_motifswAF_addStall_1000_HeatMap_{_c}.svg'), dpi=600, bbox_inches='tight', pad_inches=0.0)
     return (
-        AA,
-        AA_1,
-        aa_3_1,
         c_text,
         cm,
         codon_counts,
-        colors_aa,
-        colors_aa_c,
-        colors_full,
-        colors_set,
         df_c_mat,
         df_c_mat_perc,
         genetic_code,
-        max_motif_val,
         num_motifs_list,
         num_non_dash,
         pos_labels_list,

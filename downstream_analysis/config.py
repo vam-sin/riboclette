@@ -1,4 +1,6 @@
 from pyhere import here
+import matplotlib.pyplot as plt
+import numpy as np
 
 # Font sizes
 FSS = 5
@@ -35,29 +37,66 @@ DISCARDED_TRANSCRIPTS = [
 SAVEFIG_KWARGS = dict(dpi=600, bbox_inches="tight", pad_inches=0.0)
 
 CONDITIONS_FIXNAME = {
-        'CTRL': 'CTRL',
-        'VAL': 'VAL',
-        'ILE': 'ILE',
-        'LEU': 'LEU',
-        'LEU_ILE': '(L, I)', 
-        'LEU_ILE_VAL': '(L, I, V)'}
+    "CTRL": "CTRL",
+    "VAL": "VAL",
+    "ILE": "ILE",
+    "LEU": "LEU",
+    "LEU_ILE": "(L, I)",
+    "LEU_ILE_VAL": "(L, I, V)",
+}
+CONDITIONS_FIXNAME_r = {v: k for k, v in CONDITIONS_FIXNAME.items()}
+
 
 def rgb_to_rgb01(rgb: tuple[int]):
     return tuple([c / 255 for c in rgb])
 
+
+AMINO_ACID_MAP = {
+    'Val': 'V',  # Valine
+    'Ile': 'I',  # Isoleucine
+    'Leu': 'L',  # Leucine
+    'Lys': 'K',  # Lysine
+    'Asn': 'N',  # Asparagine
+    'Thr': 'T',  # Threonine
+    'Arg': 'R',  # Arginine
+    'Ser': 'S',  # Serine
+    'Met': 'M',  # Methionine
+    'Gln': 'Q',  # Glutamine
+    'His': 'H',  # Histidine
+    'Pro': 'P',  # Proline
+    'Glu': 'E',  # Glutamic acid
+    'Asp': 'D',  # Aspartic acid
+    'Ala': 'A',  # Alanine
+    'Gly': 'G',  # Glycine
+    'Tyr': 'Y',  # Tyrosine
+    'Cys': 'C',  # Cysteine
+    'Trp': 'W',  # Tryptophan
+    'Phe': 'F',  # Phenylalanine
+}
+AMINO_ACID_MAP_r = {v: k for k, v in AMINO_ACID_MAP.items()}
+
 # Colors
-ATTR_COL = rgb_to_rgb01((230,159,0))
-TRUE_COL = rgb_to_rgb01((0,114,178))
-PRED_COL = rgb_to_rgb01((0,158,115))
-ASITE_COL = rgb_to_rgb01((213,94,0))
-DEPRCDN_COL = rgb_to_rgb01((0,114,178))
+ATTR_COL = rgb_to_rgb01((230, 159, 0))
+TRUE_COL = rgb_to_rgb01((0, 158, 115))
+PRED_COL = rgb_to_rgb01((0, 114, 178))
+ASITE_COL = rgb_to_rgb01((213, 94, 0))
+DEPRCDN_COL = rgb_to_rgb01((0, 114, 178))
 
 COND_COL = dict(
-  CTRL=rgb_to_rgb01((230,159,0)),
-  VAL=rgb_to_rgb01((0,114,178)),
-  ILE=rgb_to_rgb01((240,228,66)),
-  LEU=rgb_to_rgb01((204,121,167)),
-  LIV=rgb_to_rgb01((213,94,0)),
-  LI=rgb_to_rgb01((10,70,0,0))
+    CTRL=rgb_to_rgb01((230, 159, 0)),
+    VAL=rgb_to_rgb01((0, 114, 178)),
+    ILE=rgb_to_rgb01((240, 228, 66)),
+    LEU=rgb_to_rgb01((204, 121, 167)),
+    LEU_ILE=rgb_to_rgb01((213, 94, 0)),
+    LEU_ILE_VAL=rgb_to_rgb01((10, 70, 0)),
 )
 
+def amino_acid_cmap():
+  colors = np.concatenate((
+    plt.get_cmap('tab20b').colors, 
+    plt.get_cmap('tab20c').colors))
+  np.random.seed(42)
+  np.random.shuffle(colors)
+  return {a: colors[idx] for idx, a in enumerate(AMINO_ACID_MAP.keys())}
+  
+AMINO_ACID_COLORS = amino_acid_cmap()
