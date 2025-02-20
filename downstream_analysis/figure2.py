@@ -201,6 +201,14 @@ def _(
 
 
 @app.cell
+def _(MODELS_PROP, config, performance_metrics_df):
+    _pm_df = performance_metrics_df.replace(dict(condition=config.CONDITIONS_FIXNAME))
+    df_overall_pcc = _pm_df.groupby(['abbr', 'condition', 'seed']).cond_PCC.mean().groupby(['abbr', 'seed']).mean().groupby('abbr').agg(['mean', 'std']).reset_index().merge(MODELS_PROP, on='abbr', how='right')
+    df_overall_pcc
+    return (df_overall_pcc,)
+
+
+@app.cell
 def _(mo):
     mo.md(r"""# Make Performance Panel""")
     return
@@ -415,7 +423,7 @@ def _(
         ax.set_xlabel('Condition')
         ax.set_title('Condition-wise Model Performance')
         ax.text(x=-0.05, y=1.15, s='a.', fontweight='bold', fontsize=8, ha='right', va='center', transform=ax.transAxes)
-        
+
         ax = ax1
         DEPR_CONDITION_ORDER = CONDITION_ORDER[1:]
         width = 0.12

@@ -25,6 +25,13 @@ ATTR_FNAMES = [
     "241105_RDHPLG_extra_int.h5",
 ]
 
+SPLIT_TO_FNAMES = {
+    'extra': ["241105_RDHPLG_extra_int.h5"],
+    'test': ["241001_RDHPLG_test_int.h5"],
+    'train': ["241022_RDHPLG_train_int.h5"],
+    'val': ["241029_RDHPLG_val_int.h5"],
+}
+
 DISCARDED_TRANSCRIPTS = [
     "ENSMUST00000000828.12",
     "ENSMUST00000060435.6",

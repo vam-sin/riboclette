@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.10.9"
+__generated_with = "0.10.19"
 app = marimo.App(width="full")
 
 
@@ -318,6 +318,12 @@ def _(df, id_to_codon_1, tqdm):
 
 
 @app.cell
+def _(id_to_codon_1):
+    id_to_codon_1
+    return
+
+
+@app.cell
 def _(
     condition_wise_dfs,
     config,
@@ -334,34 +340,41 @@ def _(
             _df_c = condition_wise_dfs[_c]
             _df_c = _df_c.drop(columns=['motif', 'perc_counts'])
             df_c_mat = _df_c.to_numpy()
+            df_c_mat_tot = np.zeros((64, 21))
             df_c_mat_perc = np.zeros((64, 21))
             for _i in range(21):
                 codon_counts = df_c_mat[:, _i]
                 num_non_dash = np.sum(codon_counts != '-')
+                _idx = 0
                 for _j in range(64):
                     df_c_mat_perc[_j, _i] = np.sum(codon_counts == id_to_codon_1[_j]) / num_non_dash * 100 if num_non_dash != 0 else 0
-            stack_data = pd.DataFrame(df_c_mat_perc, index=[id_to_codon_1[i] for i in range(64)])
-            stack_data = stack_data.sort_values(by=stack_data.columns.tolist(), ascending=False)
-            stack_data_t = stack_data[stack_data.sum(axis=1) > stack_data.sum(axis=1).mean()]
-            stack_data_thresh = stack_data_t / stack_data_t.sum(axis=0)
-            square_side = 2
-            _h = ma.Heatmap(stack_data_thresh.T, linewidth=0.5, width=square_side, height=square_side, cmap='Blues', label='Frequency', vmin=0, vmax=1, cbar_kws=dict(orientation='horizontal', height=1.5, title_fontproperties=dict(weight='normal', size=config.FSM), fontsize=config.FSS))
-            
+                    df_c_mat_tot[_j, _i] = np.sum(codon_counts == id_to_codon_1[_j])
+                    
+            stack_data = pd.DataFrame(df_c_mat_tot, index=[id_to_codon_1[i] for i in range(64)])
             genetic_code = pd.read_csv(config.GENCODE_FPATH, index_col=0).set_index('Codon')
+            top_aa = stack_data.merge(genetic_code, right_index=True, left_index=True).groupby('AminoAcid').sum().sum(axis=1).nlargest(3).index.values
+            top_codons = genetic_code.reset_index().query('AminoAcid !="Stp"').set_index('AminoAcid').Codon.values#.loc[top_aa].Codon.values
+            stack_data_t = stack_data.loc[top_codons]
+            stack_data_thresh = stack_data_t / stack_data_t.max().max()
+            _h = ma.Heatmap(stack_data_thresh.T, linewidth=0.5, width=1.6/17*len(top_codons), height=2, cmap='Blues', label='Rescaled occurrence count', vmin=0, vmax=1, cbar_kws=dict(orientation='horizontal', height=1.5, title_fontproperties=dict(weight='normal', size=config.FSM), fontsize=config.FSS))
+
             genetic_code = genetic_code.loc[stack_data_thresh.index]
             _aa_oneletter = [config.AMINO_ACID_MAP[_a] for _a in genetic_code.AminoAcid]
             _aa_oneletter_order = np.unique(_aa_oneletter)
-            _h.group_cols(group=_aa_oneletter, order=_aa_oneletter_order, spacing=0.007)
+            _h.group_cols(group=_aa_oneletter, order=_aa_oneletter_order, spacing=0.002)
             _colors = [config.AMINO_ACID_COLORS[config.AMINO_ACID_MAP_r[_a]] for _a in _aa_oneletter_order]
             _h.add_top(ma.plotter.Chunk(_aa_oneletter_order, _colors, fontsize=config.FSM), pad=0.025)
             _h.add_bottom(ma.plotter.Labels(list(stack_data_thresh.index), fontsize=config.FSS, rotation=45), name='Codon')
-            num_motifs_list = stack_data_t.sum(axis=0).values / 100
-            for _i in range(21):
-                codon_counts = df_c_mat[:, _i]
-                num_non_dash = np.sum(codon_counts != '-')
-                num_motifs_list[_i] = num_non_dash * num_motifs_list[_i]
-            num_motifs_list = np.log(num_motifs_list + 1)
-            cm = ma.plotter.ColorMesh(num_motifs_list.reshape(1, -1), cmap='Reds', vmin=0, vmax=11, cbar_kws=dict(orientation='horizontal', title='Num. Motifs (log)', height=1.5, title_fontproperties=dict(weight='normal', size=config.FSM), fontsize=config.FSS))
+            num_motifs_list = stack_data_t.sum(axis=0).values
+            num_motifs_list /= np.sum(num_motifs_list)
+            num_motifs_list *= 100
+            #print(num_motifs_list)
+            #for _i in range(21):
+            #    codon_counts = df_c_mat[:, _i]
+            #    num_non_dash = np.sum(codon_counts != '-')
+            #    num_motifs_list[_i] = num_non_dash * num_motifs_list[_i]
+            #num_motifs_list = np.log(num_motifs_list + 1)
+            cm = ma.plotter.ColorMesh(num_motifs_list.reshape(1, -1), cmap='Reds', vmin=0, vmax=30, cbar_kws=dict(orientation='horizontal', title='Position freq (%)', height=1.5, title_fontproperties=dict(weight='normal', size=config.FSM), fontsize=config.FSS))
             _h.add_right(cm, pad=0.05, size=0.075)
             c_text = _c
             if _c == 'LEU_ILE':
@@ -375,21 +388,115 @@ def _(
                 _h.add_legends(pad=0.025)
             _h.render()
             plt.savefig(here('data', 'results', 'figures', f'figure4_motifswAF_addStall_1000_HeatMap_{_c}.svg'), dpi=600, bbox_inches='tight', pad_inches=0.0)
+            plt.show()
     return (
         c_text,
         cm,
         codon_counts,
         df_c_mat,
         df_c_mat_perc,
+        df_c_mat_tot,
         genetic_code,
         num_motifs_list,
         num_non_dash,
         pos_labels_list,
-        square_side,
         stack_data,
         stack_data_t,
         stack_data_thresh,
+        top_aa,
+        top_codons,
     )
+
+
+@app.cell
+def _(
+    condition_wise_dfs,
+    config,
+    here,
+    id_to_codon_1,
+    ma,
+    np,
+    pd,
+    plt,
+    utils,
+):
+    def make_motif_heatmaps(filter_aa = True):
+        for _c in ['CTRL', 'ILE', 'LEU', 'VAL', 'LEU_ILE', 'LEU_ILE_VAL']:
+            _df_c = condition_wise_dfs[_c]
+            _df_c = _df_c.drop(columns=['motif', 'perc_counts'])
+            df_c_mat = _df_c.to_numpy()
+            df_c_mat_tot = np.zeros((64, 21))
+            df_c_mat_perc = np.zeros((64, 21))
+            for _i in range(21):
+                codon_counts = df_c_mat[:, _i]
+                num_non_dash = np.sum(codon_counts != '-')
+                _idx = 0
+                for _j in range(64):
+                    df_c_mat_perc[_j, _i] = np.sum(codon_counts == id_to_codon_1[_j]) / num_non_dash * 100 if num_non_dash != 0 else 0
+                    df_c_mat_tot[_j, _i] = np.sum(codon_counts == id_to_codon_1[_j])
+                    
+            stack_data = pd.DataFrame(df_c_mat_tot, index=[id_to_codon_1[i] for i in range(64)])
+            genetic_code = pd.read_csv(config.GENCODE_FPATH, index_col=0).set_index('Codon')
+            top_aa = stack_data.merge(genetic_code, right_index=True, left_index=True).groupby('AminoAcid').max().max(axis=1)
+            print(top_aa)
+            top_aa /= top_aa.max()
+            top_aa = top_aa.loc[top_aa > .5]
+            print(top_aa)
+            top_codons = genetic_code.reset_index().query('AminoAcid !="Stp"').set_index('AminoAcid')
+            if filter_aa:
+                top_codons = top_codons.loc[top_aa.index]
+            stack_data_t = stack_data.loc[top_codons.Codon.values]
+            stack_data_thresh = stack_data_t / stack_data_t.max().max()
+            
+            _h = ma.Heatmap(stack_data_thresh.T, linewidth=0.5, width=1.6/17*len(top_codons), height=2, cmap='Blues', label='Rescaled occurrence count', vmin=0, vmax=1, cbar_kws=dict(orientation='horizontal', height=1.5, title_fontproperties=dict(weight='normal', size=config.FSM), fontsize=config.FSS))
+
+            genetic_code = genetic_code.loc[stack_data_thresh.index]
+            _aa_oneletter = [config.AMINO_ACID_MAP[_a] for _a in genetic_code.AminoAcid]
+            _aa_oneletter_order = np.unique(_aa_oneletter)
+            _h.group_cols(group=_aa_oneletter, order=_aa_oneletter_order, spacing=0.007 if filter_aa else 0.002)
+            _colors = [config.AMINO_ACID_COLORS[config.AMINO_ACID_MAP_r[_a]] for _a in _aa_oneletter_order]
+            _h.add_top(ma.plotter.Chunk(_aa_oneletter_order, _colors, fontsize=config.FSM), pad=0.025)
+            _h.add_bottom(ma.plotter.Labels(list(stack_data_thresh.index), fontsize=config.FSS, rotation=45), name='Codon')
+            num_motifs_list = stack_data_t.sum(axis=0).values
+            num_motifs_list /= np.sum(num_motifs_list)
+            num_motifs_list *= 100
+            #print(num_motifs_list)
+            #for _i in range(21):
+            #    codon_counts = df_c_mat[:, _i]
+            #    num_non_dash = np.sum(codon_counts != '-')
+            #    num_motifs_list[_i] = num_non_dash * num_motifs_list[_i]
+            #num_motifs_list = np.log(num_motifs_list + 1)
+            cm = ma.plotter.ColorMesh(num_motifs_list.reshape(1, -1), cmap='Reds', vmin=0, vmax=30, cbar_kws=dict(orientation='horizontal', title='Position freq (%)', height=1.5, title_fontproperties=dict(weight='normal', size=config.FSM), fontsize=config.FSS))
+            _h.add_right(cm, pad=0.05, size=0.075)
+            c_text = _c
+            if _c == 'LEU_ILE':
+                c_text = '(L, I)'
+            if _c == 'LEU_ILE_VAL':
+                c_text = '(L, I, V)'
+            _h.add_title(c_text, fontsize=config.FSB)
+            pos_labels_list = ['-10', '-9', '-8', '-7', '-6', '-5', '-4', '-3', 'E', 'P', 'A', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
+            _h.add_left(ma.plotter.Labels(list(pos_labels_list), fontsize=config.FSS))
+            if _c == 'CTRL':
+                _h.add_legends(pad=0.025)
+            _h.render()
+            if filter_aa:
+                fpath = here('data', 'results', 'figures', f'figure4_motif_heatmap_{_c}.svg')
+            else:
+                fpath = here('data', 'results', 'figures', 'supplementary', f'supp_motif_heatmap_{_c}.svg')
+                
+            plt.savefig(fpath, dpi=600, bbox_inches='tight', pad_inches=0.0)
+            plt.show()
+
+    with utils.journal_plotting_ctx():
+        make_motif_heatmaps(True)
+    return (make_motif_heatmaps,)
+
+
+@app.cell
+def _(make_motif_heatmaps, utils):
+    with utils.journal_plotting_ctx():
+        make_motif_heatmaps(False)
+    return
 
 
 @app.cell
