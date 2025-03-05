@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.10.19"
+__generated_with = "0.11.9"
 app = marimo.App(width="full")
 
 
@@ -41,11 +41,17 @@ def _():
 
 
 @app.cell
-def _():
-    def global_attr_plot(ax, data, title:str, xlabel=False, ylabel=False, yticks=False, xticks=False):
-        ax.hist(data, bins=21, color='#e74c3c', edgecolor='#ffffff', linewidth=1, range=(-10, 10), density=True)
+def _(np):
+    def global_attr_plot(ax, data, title:str, xlim=(-10,10), xlabel=False, ylabel=False, yticks=False, xticks=False, ylogscale=False):
+        data = np.array(data)
+        data = data[(data > xlim[0]) & (data < xlim[1])]
+        unique_values, counts = np.unique(data, return_counts=True)
+        ax.bar(unique_values, counts/np.sum(counts), color='#6291B0')
+        ax.axvspan(-5.4, 4.4, color='#6291B0', alpha=0.2)
+        if ylogscale: ax.set_yscale('log')
+        #ax.hist(data, bins=41, color='#e74c3c', edgecolor='#ffffff', linewidth=2, range=(-20, 20), density=True, log=True, align='mid')
         ax.axvline(0, color='black', linestyle='--', linewidth=1)
-        if xticks: ax.set_xticks([-10, -4.75, 0, 4.75, 10], [-10, -5, 'A', 5, 10])
+        #if xticks: ax.set_xticks([-15,-10, -5, 0, 5, 10,15], [-15,-10, -5, 'A', 5, 10,15])
         if yticks: ax.set_yticks([0,.05,.1])
         if title: ax.set_title(title)
         if xlabel: ax.set_xlabel('Codon Distance from A-site')
@@ -158,12 +164,6 @@ def _(adjust_text, config, itertools, np, pearsonr):
 
 
 @app.cell
-def _(config):
-    config.CONDITIONS_FIXNAME
-    return
-
-
-@app.cell
 def _(config, ma):
     def topk_attributions(data, genetic_code, width: float, height=float, fontsizes: list[int] = [5,6,7]):
 
@@ -235,7 +235,12 @@ def _(
         global_attr_plot(ax, np.concatenate([dd_data[k] for k in dd_data.keys() if k != "CTRL"]), title='Deprivation Difference', yticks=False, xticks=True)
         plt.tick_params('y', labelleft=False)
         subfig_coords = sub_gs.get_grid_positions(fig)
-        ax.text(subfig_coords[2][1] - 0.02, subfig_coords[0] - 0.22, 'Codon Distance from A-site', transform=fig.transFigure, ha='center', fontsize=config.FSM)
+        ax.text(subfig_coords[2][1] - 0.02, subfig_coords[0][0] - 0.22, 'Codon Distance from A-site', transform=fig.transFigure, ha='center', fontsize=config.FSM)
+
+        from matplotlib.patches import Patch
+        legend_elements = [Patch(facecolor='#6291B0', alpha=0.2, label='Ribosome protected fragment')]
+        ax.legend(loc='center', bbox_to_anchor=(subfig_coords[2][1] - 0.02, -0.2), handles=legend_elements, frameon=False, bbox_transform=fig.transFigure)
+
 
         sub_gs = gs[0, 2:].subgridspec(1, 3, wspace=0.1)
         axs = [fig.add_subplot(sub_gs[row, col]) for row in range(1) for col in range(0, 3)]
@@ -253,6 +258,9 @@ def _(
         legend_elements = [mpl.lines.Line2D([0], [0], marker='o', color='w', label='CTRL', markerfacecolor=config.COND_COL['CTRL'], markersize=5), mpl.lines.Line2D([0], [0], marker='o', color='w', label='ILE', markerfacecolor=config.COND_COL['ILE'], markersize=5), mpl.lines.Line2D([0], [0], marker='o', color='w', label='LEU', markerfacecolor=config.COND_COL['LEU'], markersize=5), mpl.lines.Line2D([0], [0], marker='o', color='w', label='VAL', markerfacecolor=config.COND_COL['VAL'], markersize=5), mpl.lines.Line2D([0], [0], marker='o', color='w', label='Other', markerfacecolor='black', markersize=5)]
         axs[1].legend(handles=legend_elements, loc='center', ncols=5, bbox_to_anchor=(0.5, -0.4), frameon=False)
         out_fpath = mo.cli_args().get("output_dirpath") or here('data', 'results', 'figures', 'figure3_1.svg')
+
+        fig.align_xlabels()
+
         plt.savefig(out_fpath, **config.SAVEFIG_KWARGS)
         plt.show()
 
@@ -326,22 +334,67 @@ def _(config, global_stalling, here, mo, mpl, pd, plt, utils):
 @app.cell
 def _(config, global_attr_plot, here, mo, np, plt, utils):
     def _():
-        corrected_width = config.TEXTWIDTH_CM + 3.75
-        aspect_ratio = 6
+        corrected_width = config.TEXTWIDTH_CM - 5
+        aspect_ratio = 4
 
-        fig, axes = plt.subplots(ncols=5, sharey=True, figsize=(corrected_width * config.CM_TO_INCH, corrected_width / aspect_ratio * config.CM_TO_INCH))
+        fig, axes = plt.subplots(ncols=5, sharey=True, figsize=(corrected_width * config.CM_TO_INCH, corrected_width / aspect_ratio * config.CM_TO_INCH), constrained_layout=True)
         cond_dd_data = np.load(here("data/results/plotting/globl_attr_plot_False.npz"))
-        cond_iter = config.CONDITIONS_FIXNAME
+        cond_iter = config.CONDITIONS_FIXNAME.copy()
         cond_iter.pop('CTRL', None)
         for i, (cond, cond_fix) in enumerate(cond_iter.items()):
             ax = fig.add_subplot(axes[i])
             global_attr_plot(ax, cond_dd_data[cond], title=cond_fix, yticks=False, xticks=True)
+
+        axes[2].set_xlabel('Codon Distance from A-site')
+        axes[0].set_ylabel('Frequency')
+        
+        from matplotlib.patches import Patch
+        legend_elements = [Patch(facecolor='#6291B0', alpha=0.2, label='Ribosome protected fragment'),]
+        fig.legend(loc='center', bbox_to_anchor=(0.5,-.05), handles=legend_elements, frameon=False)
+    
         out_fpath = mo.cli_args().get("output_dirpath") or here('data', 'results', 'figures', 'supplementary', 'supp_attr_hist.pdf')
         plt.savefig(out_fpath, **config.SAVEFIG_KWARGS)
         plt.show()
 
     with plt.style.context(['grid', 'nature', 'no-latex']), utils.journal_plotting_ctx():
         _()
+    return
+
+
+@app.cell
+def _(config, global_attr_plot, here, mo, np, plt, utils):
+    def _():
+        corrected_width = config.TEXTWIDTH_CM
+        aspect_ratio = 5
+
+        fig, axes = plt.subplots(ncols=6, sharey=True, figsize=(corrected_width * config.CM_TO_INCH, corrected_width / aspect_ratio * config.CM_TO_INCH), constrained_layout=True)
+        ctrl_data = np.load(here("data/results/plotting/globl_attr_plot_True.npz"))['CTRL'] 
+        cond_dd_data = np.load(here("data/results/plotting/globl_attr_plot_False.npz"))
+        cond_iter = config.CONDITIONS_FIXNAME
+        #cond_iter.pop('CTRL', None)
+        for i, (cond, cond_fix) in enumerate(cond_iter.items()):
+            axes[i].axvspan(13, 15, color='#e74c3c', alpha=0.1)
+            data = ctrl_data if cond == 'CTRL' else cond_dd_data[cond]
+            global_attr_plot(axes[i], data, title=cond_fix, yticks=False, xticks=True, ylogscale=True, xlim=(-20,20))
+
+        axes[2].set_xlabel('Codon Distance from A-site')
+        axes[0].set_ylabel('Log Frequency')
+        
+        from matplotlib.patches import Patch
+        legend_elements = [Patch(facecolor='#6291B0', alpha=0.2, label='Ribosome protected fragment'), Patch(facecolor='#e74c3c', alpha=0.2, label='Expected disome positions')]
+        fig.legend(ncols=2,loc='center', bbox_to_anchor=(0.5,-.05), handles=legend_elements, frameon=False)
+    
+        out_fpath = mo.cli_args().get("output_dirpath") or here('data', 'results', 'figures', 'supplementary', 'supp_attr_hist_disome.pdf')
+        plt.savefig(out_fpath, **config.SAVEFIG_KWARGS)
+        plt.show()
+
+    with plt.style.context(['grid', 'nature', 'no-latex']), utils.journal_plotting_ctx():
+        _()
+    return
+
+
+@app.cell
+def _():
     return
 
 

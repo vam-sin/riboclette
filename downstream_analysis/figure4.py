@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.10.19"
+__generated_with = "0.11.9"
 app = marimo.App(width="full")
 
 
@@ -40,10 +40,21 @@ def _(mo):
 
 @app.cell
 def _(here, np):
-    mutations_everything = np.load(here('data', 'results', 'motifs', 'raw_bms', 'motifswAF_addStall_1000.npz'), allow_pickle=True)['mutations_everything'].item()
-    keys = list(mutations_everything.keys())
-    print(keys)
-    return keys, mutations_everything
+    #mutations_everything = np.load(here('data', 'results', 'motifs', 'raw_bms', 'motifswAF_addStall_1000.npz'), allow_pickle=True)['mutations_everything'].item()
+    #keys = list(mutations_everything.keys())
+    #print(keys)
+
+    test = np.load(here('data', 'results', 'motifs', 'motifswA_addStall_41_1000_LEU.npz'), allow_pickle=True)
+    test
+    mutations_everything = test['arr_0'].item()
+    keys = mutations_everything.keys()
+    return keys, mutations_everything, test
+
+
+@app.cell
+def _(keys):
+    keys
+    return
 
 
 @app.cell
@@ -69,7 +80,7 @@ def _(keys, mutations_everything, np, tqdm):
             motif_len.append(int(len(mot) / 2))
             motif_sample_dict = {}
             for _i in range(0, len(mot), 2):
-                motif_sample_dict[mot[_i] - (start + 10)] = mot[_i + 1]
+                motif_sample_dict[mot[_i] - (start + 20)] = mot[_i + 1]
             motif_sample_dict = dict(sorted(motif_sample_dict.items()))
             motif_str_sample = ''
             for k1, v1 in motif_sample_dict.items():
@@ -211,17 +222,7 @@ def _(agg_filled_motifs_df, np):
 
 
 @app.cell
-def _(
-    agg_filled_motifs_df,
-    config,
-    here,
-    ma,
-    maape,
-    np,
-    plt,
-    pos_freq,
-    utils,
-):
+def _(agg_filled_motifs_df, config, here, ma, maape, np, plt, pos_freq, utils):
     from matplotlib.ticker import FuncFormatter, FixedLocator
     with utils.journal_plotting_ctx():
         fmt = FuncFormatter(lambda x, _: f'{x:.0%}')
@@ -295,24 +296,24 @@ def _(motif_str):
 
 
 @app.cell
-def _(df, id_to_codon_1, tqdm):
+def _(df, id_to_codon_1, np, tqdm):
     condition_wise_dfs = {}
     for _c in df['condition'].unique():
         _df_c = df[df['condition'] == _c]
         _df_c = _df_c['motif'].value_counts(normalize=True).reset_index()
         _df_c.columns = ['motif', 'perc']
-        c_list_fin = [[] for _ in range(21)]
+        c_list_fin = [[] for _ in range(41)]
         for m in tqdm(_df_c['motif']):
             m_s = m.split('_')[:-1]
             for _i in range(0, len(m_s), 2):
-                c_list_fin[int(m_s[_i]) + 10].append(id_to_codon_1[int(m_s[_i + 1])])
+                c_list_fin[int(m_s[_i]) + 20].append(id_to_codon_1[int(m_s[_i + 1])])
             pos_motif = [int(x) for x in m_s[::2]]
-            for _i in range(-10, 11):
+            for _i in range(-20, 21):
                 if _i not in pos_motif:
-                    c_list_fin[_i + 10].append('-')
-        for _i in range(-10, 11):
-            _df_c['codon_' + str(_i)] = c_list_fin[_i + 10]
-        _df_c.columns = ['motif', 'perc_counts'] + ['-10', '-9', '-8', '-7', '-6', '-5', '-4', '-3', 'E', 'P', 'A', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
+                    c_list_fin[_i + 20].append('-')
+        for _i in range(-20, 21):
+            _df_c['codon_' + str(_i)] = c_list_fin[_i + 20]
+        _df_c.columns = ['motif', 'perc_counts'] + [str(i) for i in np.arange(-20, -2)] + ['E', 'P', 'A'] + [str(idx) for idx in np.arange(1, 21)]
         condition_wise_dfs[_c] = _df_c
     return c_list_fin, condition_wise_dfs, m, m_s, pos_motif
 
@@ -324,39 +325,29 @@ def _(id_to_codon_1):
 
 
 @app.cell
-def _(
-    condition_wise_dfs,
-    config,
-    here,
-    id_to_codon_1,
-    ma,
-    np,
-    pd,
-    plt,
-    utils,
-):
+def _(condition_wise_dfs, config, here, id_to_codon_1, ma, np, pd, plt, utils):
     with utils.journal_plotting_ctx():
         for _c in ['CTRL', 'ILE', 'LEU', 'VAL', 'LEU_ILE', 'LEU_ILE_VAL']:
             _df_c = condition_wise_dfs[_c]
             _df_c = _df_c.drop(columns=['motif', 'perc_counts'])
             df_c_mat = _df_c.to_numpy()
-            df_c_mat_tot = np.zeros((64, 21))
-            df_c_mat_perc = np.zeros((64, 21))
-            for _i in range(21):
+            df_c_mat_tot = np.zeros((64, 41))
+            df_c_mat_perc = np.zeros((64, 41))
+            for _i in range(41):
                 codon_counts = df_c_mat[:, _i]
                 num_non_dash = np.sum(codon_counts != '-')
                 _idx = 0
                 for _j in range(64):
                     df_c_mat_perc[_j, _i] = np.sum(codon_counts == id_to_codon_1[_j]) / num_non_dash * 100 if num_non_dash != 0 else 0
                     df_c_mat_tot[_j, _i] = np.sum(codon_counts == id_to_codon_1[_j])
-                    
+
             stack_data = pd.DataFrame(df_c_mat_tot, index=[id_to_codon_1[i] for i in range(64)])
             genetic_code = pd.read_csv(config.GENCODE_FPATH, index_col=0).set_index('Codon')
             top_aa = stack_data.merge(genetic_code, right_index=True, left_index=True).groupby('AminoAcid').sum().sum(axis=1).nlargest(3).index.values
             top_codons = genetic_code.reset_index().query('AminoAcid !="Stp"').set_index('AminoAcid').Codon.values#.loc[top_aa].Codon.values
             stack_data_t = stack_data.loc[top_codons]
-            stack_data_thresh = stack_data_t / stack_data_t.max().max()
-            _h = ma.Heatmap(stack_data_thresh.T, linewidth=0.5, width=1.6/17*len(top_codons), height=2, cmap='Blues', label='Rescaled occurrence count', vmin=0, vmax=1, cbar_kws=dict(orientation='horizontal', height=1.5, title_fontproperties=dict(weight='normal', size=config.FSM), fontsize=config.FSS))
+            stack_data_thresh = stack_data_t / stack_data_t.max()
+            _h = ma.Heatmap(stack_data_thresh.T, linewidth=0.5, width=1.6/17*len(top_codons), height=5, cmap='Blues', label='Rescaled occurrence count', vmin=0, vmax=stack_data_thresh.max().max(), cbar_kws=dict(orientation='horizontal', height=1.5, title_fontproperties=dict(weight='normal', size=config.FSM), fontsize=config.FSS))
 
             genetic_code = genetic_code.loc[stack_data_thresh.index]
             _aa_oneletter = [config.AMINO_ACID_MAP[_a] for _a in genetic_code.AminoAcid]
@@ -366,15 +357,18 @@ def _(
             _h.add_top(ma.plotter.Chunk(_aa_oneletter_order, _colors, fontsize=config.FSM), pad=0.025)
             _h.add_bottom(ma.plotter.Labels(list(stack_data_thresh.index), fontsize=config.FSS, rotation=45), name='Codon')
             num_motifs_list = stack_data_t.sum(axis=0).values
-            num_motifs_list /= np.sum(num_motifs_list)
-            num_motifs_list *= 100
+            #num_motifs_list /= np.sum(num_motifs_list)
+            #num_motifs_list *= 100
+            plt.bar(np.arange(41), num_motifs_list)
+            plt.yscale('log')
+            plt.xticks(np.arange(41), [str(i) for i in np.arange(-20, -2)] + ['E', 'P', 'A'] + [str(idx) for idx in np.arange(1, 21)])
             #print(num_motifs_list)
             #for _i in range(21):
             #    codon_counts = df_c_mat[:, _i]
             #    num_non_dash = np.sum(codon_counts != '-')
             #    num_motifs_list[_i] = num_non_dash * num_motifs_list[_i]
             #num_motifs_list = np.log(num_motifs_list + 1)
-            cm = ma.plotter.ColorMesh(num_motifs_list.reshape(1, -1), cmap='Reds', vmin=0, vmax=30, cbar_kws=dict(orientation='horizontal', title='Position freq (%)', height=1.5, title_fontproperties=dict(weight='normal', size=config.FSM), fontsize=config.FSS))
+            cm = ma.plotter.ColorMesh(num_motifs_list.reshape(1, -1), cmap='Reds', cbar_kws=dict(orientation='horizontal', title='Position freq (%)', height=1.5, title_fontproperties=dict(weight='normal', size=config.FSM), fontsize=config.FSS))
             _h.add_right(cm, pad=0.05, size=0.075)
             c_text = _c
             if _c == 'LEU_ILE':
@@ -382,7 +376,7 @@ def _(
             if _c == 'LEU_ILE_VAL':
                 c_text = '(L, I, V)'
             _h.add_title(c_text, fontsize=config.FSB)
-            pos_labels_list = ['-10', '-9', '-8', '-7', '-6', '-5', '-4', '-3', 'E', 'P', 'A', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
+            pos_labels_list = [str(i) for i in np.arange(-20, -2)] + ['E', 'P', 'A'] + [str(idx) for idx in np.arange(1, 21)]
             _h.add_left(ma.plotter.Labels(list(pos_labels_list), fontsize=config.FSS))
             if _c == 'CTRL':
                 _h.add_legends(pad=0.025)
@@ -409,17 +403,7 @@ def _(
 
 
 @app.cell
-def _(
-    condition_wise_dfs,
-    config,
-    here,
-    id_to_codon_1,
-    ma,
-    np,
-    pd,
-    plt,
-    utils,
-):
+def _(condition_wise_dfs, config, here, id_to_codon_1, ma, np, pd, plt, utils):
     def make_motif_heatmaps(filter_aa = True):
         for _c in ['CTRL', 'ILE', 'LEU', 'VAL', 'LEU_ILE', 'LEU_ILE_VAL']:
             _df_c = condition_wise_dfs[_c]
@@ -434,7 +418,7 @@ def _(
                 for _j in range(64):
                     df_c_mat_perc[_j, _i] = np.sum(codon_counts == id_to_codon_1[_j]) / num_non_dash * 100 if num_non_dash != 0 else 0
                     df_c_mat_tot[_j, _i] = np.sum(codon_counts == id_to_codon_1[_j])
-                    
+
             stack_data = pd.DataFrame(df_c_mat_tot, index=[id_to_codon_1[i] for i in range(64)])
             genetic_code = pd.read_csv(config.GENCODE_FPATH, index_col=0).set_index('Codon')
             top_aa = stack_data.merge(genetic_code, right_index=True, left_index=True).groupby('AminoAcid').max().max(axis=1)
@@ -447,7 +431,7 @@ def _(
                 top_codons = top_codons.loc[top_aa.index]
             stack_data_t = stack_data.loc[top_codons.Codon.values]
             stack_data_thresh = stack_data_t / stack_data_t.max().max()
-            
+
             _h = ma.Heatmap(stack_data_thresh.T, linewidth=0.5, width=1.6/17*len(top_codons), height=2, cmap='Blues', label='Rescaled occurrence count', vmin=0, vmax=1, cbar_kws=dict(orientation='horizontal', height=1.5, title_fontproperties=dict(weight='normal', size=config.FSM), fontsize=config.FSS))
 
             genetic_code = genetic_code.loc[stack_data_thresh.index]
@@ -483,7 +467,7 @@ def _(
                 fpath = here('data', 'results', 'figures', f'figure4_motif_heatmap_{_c}.svg')
             else:
                 fpath = here('data', 'results', 'figures', 'supplementary', f'supp_motif_heatmap_{_c}.svg')
-                
+
             plt.savefig(fpath, dpi=600, bbox_inches='tight', pad_inches=0.0)
             plt.show()
 

@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.10.19"
+__generated_with = "0.11.9"
 app = marimo.App(width="full")
 
 
@@ -67,8 +67,11 @@ def _(here):
 
 @app.cell
 def _():
-    BRIGHT_PALETTE = ['#e69f00', '#cc79a7','#009e73','#d55e00','#0072b2', '#f0e442','#56b4e9']
-    return (BRIGHT_PALETTE,)
+    def rgb_to_hex(r, g, b):
+        return '#{:02X}{:02X}{:02X}'.format(r, g, b)
+
+    BRIGHT_PALETTE = [rgb_to_hex(218, 142, 192), rgb_to_hex(249, 218, 86), rgb_to_hex(145, 159, 199), rgb_to_hex(176, 215, 103)]
+    return BRIGHT_PALETTE, rgb_to_hex
 
 
 @app.cell
@@ -76,11 +79,11 @@ def _(BRIGHT_PALETTE, pd):
     MODELS_PROP=[
         ('RiboMIMO', 'RiboMIMO', 'RM', False, BRIGHT_PALETTE[0]),
         #('BiLSTM-CSH', 'BiLSTM [SH]', 'BLSH', False, BRIGHT_PALETTE[1]),
-        ('BiLSTM-DH', 'Riboclette BiLSTM', 'BLDH', True, BRIGHT_PALETTE[2]),
+        ('BiLSTM-DH', 'Riboclette BiLSTM', 'BLDH', True, BRIGHT_PALETTE[1]),
         #('XLNet-CSH', 'Riboclette [SH]', 'RSH', False, BRIGHT_PALETTE[3]),
-        ('XLNet-DH', 'Riboclette MHA', 'RDH', True,BRIGHT_PALETTE[4]),
-        ('XLNet-PLabelDH_exp1', 'Riboclette MHA-PLT', 'RDHPLT', True,BRIGHT_PALETTE[5]),
-        ('XLNet-PLabelDH_exp2', 'Riboclette MHA-PLG', 'RDHPLG', True,BRIGHT_PALETTE[6]),
+        ('XLNet-DH', 'Riboclette Tr', 'RDH', True,BRIGHT_PALETTE[2]),
+        ('XLNet-PLabelDH_exp1', 'Riboclette Tr-Pl', 'RDHPLT', True,BRIGHT_PALETTE[3]),
+        #('XLNet-PLabelDH_exp2', 'Riboclette MHA-PLG', 'RDHPLG', True,BRIGHT_PALETTE[6]),
     ]
     MODELS_PROP = pd.DataFrame(MODELS_PROP).rename(columns={0:'fname', 1:'model', 2:'abbr',3:'is_dh',4:'color'})
     MODELS_PROP
@@ -244,10 +247,10 @@ def _(
         ax = ax0
         ax.axis('off')
         ax.set_title('Pseudo-Labeling')
-        ax.text(x=-0.08, y=1.15, s='a.', fontweight='bold', fontsize=8, ha='right', va='center', transform=ax.transAxes)
+        ax.text(x=-0.08, y=1.15, s='a', fontsize=8, ha='right', va='center', transform=ax.transAxes)
         ax = ax1
         width = 0.15
-        multiplier = -2
+        multiplier = -1.5
         x_ticks = np.arange(_pm_df.condition.nunique() + 1)
         seed_cond_mean_1 = _pm_df.groupby(['abbr', 'condition', 'seed']).cond_PCC.mean().reset_index()
         for idx, (abbr, color) in enumerate(MODELS_PROP[['abbr', 'color']].values):
@@ -264,12 +267,12 @@ def _(
         ax.xaxis.set_ticks_position('none')
         ax.set_ylabel('PCC')
         ax.set_xlabel('Condition')
-        ax.set_title('Condition-wise Model Performance')
-        ax.text(x=-0.05, y=1.15, s='b.', fontweight='bold', fontsize=8, ha='right', va='center', transform=ax.transAxes)
+        ax.set_title('Condition-wise deprivation condition (DC)')
+        ax.text(x=-0.05, y=1.15, s='b', fontsize=8, ha='right', va='center', transform=ax.transAxes)
         ax = ax2
         DEPR_CONDITION_ORDER = CONDITION_ORDER[1:]
         width = 0.12
-        multiplier = -1.5
+        multiplier = -1
         x_ticks = np.arange(_pm_df.condition.nunique() - 1)
         seed_cond_mean_1 = _pm_df.groupby(['abbr', 'condition', 'seed']).depr_PCC.mean().reset_index().dropna()
         for abbr in MODELS_PROP['abbr'].values:
@@ -289,8 +292,8 @@ def _(
         ax.xaxis.set_ticks_position('none')
         ax.set_ylabel('PCC')
         ax.set_xlabel('Condition')
-        ax.set_title('Condition-wise Deprivation Performance')
-        ax.text(x=-0.08, y=1.15, s='c.', fontweight='bold', fontsize=8, ha='right', va='center', transform=ax.transAxes)
+        ax.set_title('Condition-wise deprivation difference (\u0394D)')
+        ax.text(x=-0.08, y=1.15, s='c', fontsize=8, ha='right', va='center', transform=ax.transAxes)
         ax = ax3
 
         selected_best_seeds = performance_metrics_df.groupby(['abbr','seed','condition']).cond_PCC.mean().groupby(['abbr', 'seed']).mean().groupby('abbr').idxmax().values
@@ -299,16 +302,16 @@ def _(
         ax.set_xlim(0, 1)
         ax.set_ylim(0, 1)
         ax.set_xlabel('RiboMIMO')
-        ax.set_ylabel('Riboclette')
+        ax.set_ylabel('Riboclette Tr-Pl')
         ax.set_xticks([0.25, 0.5, 0.75], [0.25, 0.5, 0.75])
         ax.set_yticks([0.25, 0.5, 0.75], [0.25, 0.5, 0.75])
-        ax.text(x=-0.25, y=1.15, s='d.', fontweight='bold', fontsize=8, ha='right', va='center', transform=ax.transAxes)
+        ax.text(x=-0.25, y=1.15, s='d', fontsize=8, ha='right', va='center', transform=ax.transAxes)
         ax = ax4
         trans_wise_data =  _pm_df.set_index(['abbr', 'seed']).loc[selected_best_seeds].query('abbr in ["RDHPLT", "BLDH"]').reset_index().pivot(index=['transcript', 'condition'], columns=['abbr'], values='cond_PCC')
         ax.scatter(y=trans_wise_data['RDHPLT'], x=trans_wise_data['BLDH'], s=1, color='#332288', alpha=0.4)
         ax.set_xlim(0, 1)
         ax.set_ylim(0, 1)
-        ax.set_xlabel('BiLSTM [DH]')
+        ax.set_xlabel('Riboclette BiLSTM')
         ax.set_xticks([0.25, 0.5, 0.75], [0.25, 0.5, 0.75])
         ax.set_yticks([0.25, 0.5, 0.75], [])
         ax.set_title('Pairwise Model Comparison')
@@ -319,12 +322,13 @@ def _(
         ax.set_ylim(0, 1)
         ax.set_xticks([0.25, 0.5, 0.75], [0.25, 0.5, 0.75])
         ax.set_yticks([0.25, 0.5, 0.75], [])
-        ax.set_xlabel('Riboclette [DH]')
+        ax.set_xlabel('Riboclette Tr')
         fig.legend(*ax1.get_legend_handles_labels(), bbox_transform=fig.transFigure, loc='center', bbox_to_anchor=(0.5, -0.05), borderaxespad=0.0, frameon=False, ncols=5)
-        plt.show()
-        output_fpath = mo.cli_args().get("output_dirpath") or here('data', 'results', 'figures', 'figure2', 'figure2.pdf')
+
+        output_fpath = mo.cli_args().get("output_dirpath") or here('data', 'results', 'figures', 'figure2', 'figure2.svg')
         if allow_overwrite or not os.path.isfile(output_fpath):
             plt.savefig(output_fpath, **config.SAVEFIG_KWARGS)
+        plt.show()
 
     with plt.style.context(['grid', 'nature', 'no-latex']), journal_plotting_ctx():
         _()
@@ -356,7 +360,6 @@ def _(
 ):
     def _():
         selected_best_seeds = performance_metrics_df.groupby(['abbr','seed','condition']).cond_PCC.mean().groupby(['abbr', 'seed']).mean().groupby('abbr').idxmax().values
-        print(selected_best_seeds)
         plot_data = performance_metrics_df.set_index(['abbr', 'seed']).loc[selected_best_seeds].reset_index().pivot(index=['transcript', 'condition'], columns='abbr', values='cond_PCC').rename(columns=dict(zip(MODELS_PROP['abbr'], MODELS_PROP['model']))).reindex(columns=MODELS_PROP['model'])
         g = sns.pairplot(plot_data, markers="+", diag_kws=dict(bins=50, color='#332288'), plot_kws=dict(s=3, color='#332288', alpha=0.4), height=config.TEXTWIDTH_INCH / 4.9)
         for ax in g.axes.flatten():
@@ -404,7 +407,7 @@ def _(
 
         ax = ax0
         width = 0.15
-        multiplier = -2
+        multiplier = -1.5
         x_ticks = np.arange(_pm_df.condition.nunique() + 1)
         seed_cond_mean_1 = _pm_df.groupby(['abbr', 'condition', 'seed']).cond_MAAPE.mean().reset_index()
         for idx, (abbr, color) in enumerate(MODELS_PROP[['abbr', 'color']].values):
@@ -421,13 +424,13 @@ def _(
         ax.xaxis.set_ticks_position('none')
         ax.set_ylabel('MAAPE')
         ax.set_xlabel('Condition')
-        ax.set_title('Condition-wise Model Performance')
-        ax.text(x=-0.05, y=1.15, s='a.', fontweight='bold', fontsize=8, ha='right', va='center', transform=ax.transAxes)
+        ax.set_title('Condition-wise deprivation condition (DC)')
+        ax.text(x=-0.05, y=1.15, s='a', fontweight='bold', fontsize=8, ha='right', va='center', transform=ax.transAxes)
 
         ax = ax1
         DEPR_CONDITION_ORDER = CONDITION_ORDER[1:]
         width = 0.12
-        multiplier = -1.5
+        multiplier = -1
         x_ticks = np.arange(_pm_df.condition.nunique() - 1)
         seed_cond_mean_1 = _pm_df.groupby(['abbr', 'condition', 'seed']).depr_MAAPE.mean().reset_index().dropna()
         for abbr in MODELS_PROP['abbr'].values:
@@ -447,10 +450,12 @@ def _(
         ax.xaxis.set_ticks_position('none')
         ax.set_ylabel('MAAPE')
         ax.set_xlabel('Condition')
-        ax.set_title('Condition-wise Deprivation Performance')
-        ax.text(x=-0.08, y=1.15, s='b.', fontweight='bold', fontsize=8, ha='right', va='center', transform=ax.transAxes)
+        ax.set_title('Condition-wise deprivation difference (\u0394D)')
+        ax.text(x=-0.08, y=1.15, s='b', fontweight='bold', fontsize=8, ha='right', va='center', transform=ax.transAxes)
 
-        output_fpath = mo.cli_args().get("output_dirpath") or here('data', 'results', 'figures', 'supplementary', 'supp_perf_maape.pdf')
+        fig.legend(*ax0.get_legend_handles_labels(), bbox_transform=fig.transFigure, loc='center', bbox_to_anchor=(0.5, -0.05), borderaxespad=0.0, frameon=False, ncols=4)
+
+        output_fpath = mo.cli_args().get("output_dirpath") or here('data', 'results', 'figures', 'supplementary', 'supp_perf_maape.svg')
         if allow_overwrite or not os.path.isfile(output_fpath):
             plt.savefig(output_fpath, **config.SAVEFIG_KWARGS)
         plt.show()
@@ -461,8 +466,8 @@ def _(
 
 
 @app.cell
-def _(get_pdf_dimensions_in_cm, here):
-    get_pdf_dimensions_in_cm(here('data', 'results', 'figures', 'supplementary', 'model_pairplot.pdf'))
+def _():
+    #get_pdf_dimensions_in_cm(here('data', 'results', 'figures', 'supplementary', 'model_pairplot.pdf'))
     return
 
 
