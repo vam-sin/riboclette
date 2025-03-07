@@ -1,6 +1,7 @@
 from pyhere import here
 import matplotlib.pyplot as plt
 import numpy as np
+import itertools
 
 # Font sizes
 FSS = 5
@@ -57,6 +58,8 @@ CONDITIONS_FIXNAME_r = {v: k for k, v in CONDITIONS_FIXNAME.items()}
 def rgb_to_rgb01(rgb: tuple[int]):
     return tuple([c / 255 for c in rgb])
 
+id_to_codon = {idx:''.join(el) for idx, el in enumerate(itertools.product(['A', 'T', 'C', 'G'], repeat=3))}
+codon_to_id = {v:k for k,v in id_to_codon.items()}
 
 AMINO_ACID_MAP = {
     'Val': 'V',  # Valine
