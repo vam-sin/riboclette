@@ -15,36 +15,6 @@ from torch.autograd import Variable
 id_to_codon = {idx:''.join(el) for idx, el in enumerate(itertools.product(['A', 'T', 'C', 'G'], repeat=3))}
 codon_to_id = {v:k for k,v in id_to_codon.items()}
 
-# dataset generation functions
-def longestZeroSeqLength(a):
-    '''
-    length of the longest sub-sequence of zeros
-    '''
-    a = a[1:-1].split(', ')
-    a = [float(k) for k in a]
-    # longest sequence of zeros
-    longest = 0
-    current = 0
-    for i in a:
-        if i == 0.0:
-            current += 1
-        else:
-            longest = max(longest, current)
-            current = 0
-    longest = max(longest, current)
-    return longest
-
-def percNans(a):
-    '''
-    returns the percentage of nans in the sequence
-    '''
-    a = a[1:-1].split(', ')
-    a = [float(k) for k in a]
-    a = np.asarray(a)
-    perc = np.count_nonzero(np.isnan(a)) / len(a)
-
-    return perc
-
 def slidingWindowZeroToNan(a, window_size=30):
     '''
     use a sliding window, if all the values in the window are 0, then replace them with nan
@@ -56,63 +26,15 @@ def slidingWindowZeroToNan(a, window_size=30):
 
     return a
 
-def coverageMod(a, window_size=30):
-    '''
-    returns the modified coverage function val in the sequence
-    '''
-    a = a[1:-1].split(', ')
-    a = [float(k) for k in a]
-    for i in range(len(a) - window_size):
-        if np.all(a[i:i+window_size] == 0.0):
-            a[i:i+window_size] = np.nan
-
-    # num non zero, non nan
-    num = 0
-    den = 0
-    for i in a:
-        if i != 0.0 and not np.isnan(i):
-            num += 1
-        if not np.isnan(i):
-            den += 1
-    
-    return num / den
-
-def sequenceLength(a):
-    '''
-    returns the length of the sequence
-    '''
-    a = a[1:-1].split(', ')
-    a = [float(k) for k in a]
-    return len(a)
-
-def uniqueGenes(df):
-    # add sequence length column
-    df['sequence_length'] = df['annotations'].apply(sequenceLength)
-    # keep only longest transcript for each gene
-    df = df.sort_values('sequence_length', ascending=False).drop_duplicates('gene').sort_index()
-    # drop sequence length column
-    df = df.drop(columns=['sequence_length'])
-
-    assert len(df['gene'].unique()) == len(df['gene'])
-
-    return df
-
-def RiboDatasetGWSDepr(threshold: float = 0.6, longZerosThresh: int = 20, percNansThresh: float = 0.1):
+def RiboDatasetGWSDepr():
     '''
     Dataset generation function
     '''
-    # save the dataframes
-    # out_train_path = 'data/orig/train_' + str(threshold) + '_NZ_' + str(longZerosThresh) + '_PercNan_' + str(percNansThresh) + '.csv'
-    # out_test_path = 'data/orig/test_' + str(threshold) + '_NZ_' + str(longZerosThresh) + '_PercNan_' + str(percNansThresh) + '.csv'
-    # out_val_path = 'data/orig/val_' + str(threshold) + '_NZ_' + str(longZerosThresh) + '_PercNan_' + str(percNansThresh) + '.csv'
+    dataset_folder = '../../../data/orig/'
 
-    out_train_path = '../../data/orig/train_' + str(threshold) + '_NZ_' + str(longZerosThresh) + '_PercNan_' + str(percNansThresh) + '.csv'
-    out_test_path = '../../data/orig/test_' + str(threshold) + '_NZ_' + str(longZerosThresh) + '_PercNan_' + str(percNansThresh) + '.csv'
-    out_val_path = '../../data/orig/val_' + str(threshold) + '_NZ_' + str(longZerosThresh) + '_PercNan_' + str(percNansThresh) + '.csv'
-
-    df_train = pd.read_csv(out_train_path)
-    df_val = pd.read_csv(out_val_path)
-    df_test = pd.read_csv(out_test_path)
+    df_train = pd.read_csv(dataset_folder + 'train.csv')
+    df_val = pd.read_csv(dataset_folder + 'val.csv')
+    df_test = pd.read_csv(dataset_folder + 'test.csv')
 
     return df_train, df_val, df_test
 
@@ -208,33 +130,6 @@ class MaskedPearsonCorr(nn.Module):
             y_pred_mask - y_pred_mask.mean(),
             y_true_mask - y_true_mask.mean(),
         )
-
-class MaskedCombinedFiveDH(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.pearson = MaskedPearsonLoss()
-        self.l1 = MaskedL1Loss()
-        self.pearson_perf = MaskedPearsonCorr()
-    
-    def __call__(self, y_pred, labels, labels_ctrl, mask_full, mask_ctrl):
-        # remove the first output cause that corresponds to the condition token
-        y_pred_ctrl = y_pred[:, 0]
-        y_pred_depr_diff = y_pred[:, 1]
-        y_pred_full = torch.sum(y_pred, dim=1)
-
-        labels_diff = labels - labels_ctrl
-
-        # combine masks to make mask diff 
-        mask_diff = mask_full & mask_ctrl
-
-        loss_ctrl = self.pearson(y_pred_ctrl, labels_ctrl, mask_ctrl) + self.l1(y_pred_ctrl, labels_ctrl, mask_ctrl)
-        loss_depr_diff = self.l1(y_pred_depr_diff, labels_diff, mask_diff)
-        loss_full = self.pearson(y_pred_full, labels, mask_full) + self.l1(y_pred_full, labels, mask_full)
-
-        perf = self.pearson_perf(y_pred_full, labels, mask_full)
-        l1 = self.l1(y_pred_full, labels, mask_full)
-
-        return loss_ctrl + loss_depr_diff + loss_full, perf, l1
     
 class MaskedCombinedFourDH(nn.Module):
     def __init__(self):
@@ -277,7 +172,6 @@ class LSTM(L.LightningModule):
         
         self.relu = nn.ReLU()
         
-        # self.loss = MaskedCombinedFiveDH()
         self.loss = MaskedCombinedFourDH()
         self.perf = MaskedPearsonCorr()
 
@@ -376,7 +270,7 @@ class LSTM(L.LightningModule):
 
         return loss
     
-def trainLSTM(num_epochs, bs, lr, save_loc, train_loader, test_loader, val_loader, dropout_val, num_layers, num_nodes, wandb_logger):
+def trainLSTM(num_epochs, bs, lr, save_loc, train_loader, test_loader, val_loader, dropout_val, num_layers, num_nodes):
     # Create a PyTorch Lightning trainer with the generation callback
     trainer = L.Trainer(
         default_root_dir=save_loc,
@@ -384,7 +278,6 @@ def trainLSTM(num_epochs, bs, lr, save_loc, train_loader, test_loader, val_loade
         devices=1,
         accumulate_grad_batches=bs,
         max_epochs=num_epochs,
-        logger=wandb_logger,
         callbacks=[
             L.pytorch.callbacks.ModelCheckpoint(dirpath=save_loc,
                 monitor='eval/loss',
@@ -405,13 +298,6 @@ def trainLSTM(num_epochs, bs, lr, save_loc, train_loader, test_loader, val_loade
     # Test best model on test set
     test_result = trainer.test(model, dataloaders=test_loader, verbose=False)
     result = {"test": test_result}
-
-    # # # # load model
-    # model = LSTM.load_from_checkpoint(save_loc+ '/epoch=2-step=53691.ckpt', dropout_val=dropout_val, num_epochs=num_epochs, bs=bs, lr=lr)
-
-    # # Test best model on test set
-    # test_result = trainer.test(model, dataloaders = test_loader, verbose=False)
-    # result = {"test": test_result}
 
     return model, result
     

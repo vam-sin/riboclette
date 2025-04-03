@@ -1,6 +1,3 @@
-'''
-Control Utils
-'''
 # libraries
 import pandas as pd 
 import numpy as np
@@ -8,41 +5,63 @@ import torch
 import torch.nn as nn
 from torch.utils.data import Dataset
 from transformers import Trainer
-from sklearn.model_selection import train_test_split
+from torchmetrics import Metric
 import itertools
+from torch.nn.utils.rnn import pad_sequence
+from torchmetrics.functional import pearson_corrcoef
 
 id_to_codon = {idx:''.join(el) for idx, el in enumerate(itertools.product(['A', 'T', 'C', 'G'], repeat=3))}
 codon_to_id = {v:k for k,v in id_to_codon.items()}
 
-# dataset generation functions
-def longestZeroSeqLength(a):
-    '''
-    length of the longest sub-sequence of zeros
-    '''
-    a = a[1:-1].split(', ')
-    a = [float(k) for k in a]
-    # longest sequence of zeros
-    longest = 0
-    current = 0
-    for i in a:
-        if i == 0.0:
-            current += 1
-        else:
-            longest = max(longest, current)
-            current = 0
-    longest = max(longest, current)
-    return longest
+class CorrCoef(Metric):
+    def __init__(self):
+        super().__init__()
+        self.add_state("corrcoefs", default=torch.tensor(0.0), dist_reduce_fx="sum")
+        self.add_state("total", default=torch.tensor(0.0), dist_reduce_fx="sum")
+    def update(self, preds, target, mask):
+        preds = preds[:, 1:]
+        assert preds.shape == target.shape
+        assert preds.shape == mask.shape
+        coeffs = []
+        for p, t, m in zip(preds, target, mask):
+            mp, mt = torch.masked_select(p, m), torch.masked_select(t, m)
+            temp_pearson = pearson_corrcoef(mp, mt)
+            coeffs.append(temp_pearson)
+        coeffs = torch.stack(coeffs)
+        self.corrcoefs += torch.sum(coeffs)
+        self.total += len(coeffs)
+    def compute(self):
+        return self.corrcoefs / self.total
 
-def percNans(a):
-    '''
-    returns the percentage of nans in the sequence
-    '''
-    a = a[1:-1].split(', ')
-    a = [float(k) for k in a]
-    a = np.asarray(a)
-    perc = np.count_nonzero(np.isnan(a)) / len(a)
+def collate_fn(batch):
+    x, y, gene, transcript = zip(*batch)
 
-    return perc
+    # sequence lenghts 
+    lengths = torch.tensor([len(x) for x in x])
+    x = pad_sequence(x, batch_first=True, padding_value=64) 
+    y = pad_sequence(y, batch_first=True, padding_value=-1)
+
+    out_batch = {}
+
+    out_batch["input_ids"] = x
+    out_batch["labels"] = y
+    out_batch["lengths"] = lengths
+
+    return out_batch
+
+def compute_metrics(pred):
+    labels = pred.label_ids 
+    preds = pred.predictions
+    mask = labels != -100.0
+    labels = torch.tensor(labels)
+    preds = torch.tensor(preds)
+    preds = torch.squeeze(preds, dim=2)
+    mask = torch.tensor(mask)
+    mask = torch.logical_and(mask, torch.logical_not(torch.isnan(labels)))
+    corr_coef = CorrCoef()
+    corr_coef.update(preds, labels, mask)
+
+    return {"r": corr_coef.compute()}
 
 def slidingWindowZeroToNan(a, window_size=30):
     '''
@@ -55,63 +74,15 @@ def slidingWindowZeroToNan(a, window_size=30):
 
     return a
 
-def coverageMod(a, window_size=30):
-    '''
-    returns the modified coverage function val in the sequence
-    '''
-    a = a[1:-1].split(', ')
-    a = [float(k) for k in a]
-    for i in range(len(a) - window_size):
-        if np.all(a[i:i+window_size] == 0.0):
-            a[i:i+window_size] = np.nan
-
-    # num non zero, non nan
-    num = 0
-    den = 0
-    for i in a:
-        if i != 0.0 and not np.isnan(i):
-            num += 1
-        if not np.isnan(i):
-            den += 1
-    
-    return num / den
-
-def sequenceLength(a):
-    '''
-    returns the length of the sequence
-    '''
-    a = a[1:-1].split(', ')
-    a = [float(k) for k in a]
-    return len(a)
-
-def uniqueGenes(df):
-    # add sequence length column
-    df['sequence_length'] = df['annotations'].apply(sequenceLength)
-    # keep only longest transcript for each gene
-    df = df.sort_values('sequence_length', ascending=False).drop_duplicates('gene').sort_index()
-    # drop sequence length column
-    df = df.drop(columns=['sequence_length'])
-
-    assert len(df['gene'].unique()) == len(df['gene'])
-
-    return df
-
-def RiboDatasetGWSDepr(threshold: float = 0.6, longZerosThresh: int = 20, percNansThresh: float = 0.1):
+def RiboDatasetGWSDepr():
     '''
     Dataset generation function
     '''
-    # save the dataframes
-    out_train_path = '../../data/orig/train_' + str(threshold) + '_NZ_' + str(longZerosThresh) + '_PercNan_' + str(percNansThresh) + '.csv'
-    out_test_path = '../../data/orig/test_' + str(threshold) + '_NZ_' + str(longZerosThresh) + '_PercNan_' + str(percNansThresh) + '.csv'
-    out_val_path = '../../data/orig/val_' + str(threshold) + '_NZ_' + str(longZerosThresh) + '_PercNan_' + str(percNansThresh) + '.csv'
+    dataset_folder = '../../../data/orig/'
 
-    # out_train_path = 'data/orig/train_' + str(threshold) + '_NZ_' + str(longZerosThresh) + '_PercNan_' + str(percNansThresh) + '.csv'
-    # out_test_path = 'data/orig/test_' + str(threshold) + '_NZ_' + str(longZerosThresh) + '_PercNan_' + str(percNansThresh) + '.csv'
-    # out_val_path = 'data/orig/val_' + str(threshold) + '_NZ_' + str(longZerosThresh) + '_PercNan_' + str(percNansThresh) + '.csv'
-
-    df_train = pd.read_csv(out_train_path)
-    df_test = pd.read_csv(out_test_path)
-    df_val = pd.read_csv(out_val_path)
+    df_train = pd.read_csv(dataset_folder + 'train.csv')
+    df_val = pd.read_csv(dataset_folder + 'val.csv')
+    df_test = pd.read_csv(dataset_folder + 'test.csv')
 
     return df_train, df_val, df_test
 
