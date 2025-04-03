@@ -36,27 +36,10 @@ riboclette/models/xlnet/csh/xlnet_csh_tune.ipynb
 riboclette/models/xlnet/func
 riboclette/models/preds_h5s
 
-riboclette/models/xlnet/interpretability/data
-riboclette/models/xlnet/interpretability/plots 
-riboclette/models/xlnet/interpretability/AA_int.ipynb 
-riboclette/models/xlnet/interpretability/check_imp_genes.ipynb 
-riboclette/models/xlnet/interpretability/codon_usage.ipynb
+riboclette/models/xlnet/interpretability/
 
 riboclette/models/xlnet/pseudolabeling/__pycache__
-riboclette/models/xlnet/pseudolabeling/codon_optimization/fasta_out
-riboclette/models/xlnet/pseudolabeling/codon_optimization/bms 
-riboclette/models/xlnet/pseudolabeling/codon_optimization/ga_motifs 
-riboclette/models/xlnet/pseudolabeling/codon_optimization/plots 
-riboclette/models/xlnet/pseudolabeling/codon_optimization/codon_optimize_windows.ipynb 
-riboclette/models/xlnet/pseudolabeling/codon_optimization/out_windows_full.ipynb 
-riboclette/models/xlnet/pseudolabeling/codon_optimization/out_windows.ipynb 
-riboclette/models/xlnet/pseudolabeling/codon_optimization/study_windows.ipynb 
-riboclette/models/xlnet/pseudolabeling/codon_optimization/window_beamSearch_fast.ipynb 
-riboclette/models/xlnet/pseudolabeling/codon_optimization/xlnet_plabel_utils.py
-riboclette/models/xlnet/pseudolabeling/codon_optimization/job_scripts
-riboclette/models/xlnet/pseudolabeling/codon_optimization/motif_bs_analysis_remStall.ipynb 
-riboclette/models/xlnet/pseudolabeling/codon_optimization/motif_caseStudy.ipynb
-riboclette/models/xlnet/pseudolabeling/codon_optimization/window_beamSearch_remStall.ipynb
+riboclette/models/xlnet/pseudolabeling/codon_optimization
 riboclette/models/xlnet/pseudolabeling/job_scripts 
 riboclette/models/xlnet/pseudolabeling/check_results_h5.ipynb
 riboclette/models/xlnet/pseudolabeling/model_outputs 
@@ -69,12 +52,7 @@ riboclette/models/xlnet/pseudolabeling/preds
 riboclette/models/xlnet/pseudolabeling/saved_models
 riboclette/models/xlnet/pseudolabeling/wandb
 riboclette/models/xlnet/pseudolabeling/plots
-riboclette/models/xlnet/pseudolabeling/batch_effect_perf_analysis.ipynb 
-riboclette/models/xlnet/pseudolabeling/dis_plot.py
-riboclette/models/xlnet/pseudolabeling/distance_pcc_plots.ipynb 
-riboclette/models/xlnet/pseudolabeling/network_motif_extraction.ipynb 
 riboclette/models/xlnet/pseudolabeling/interpret_plabel_batch_extra.ipynb 
-riboclette/models/xlnet/pseudolabeling/shapiq_motifs.ipynb  
 riboclette/models/xlnet/pseudolabeling/xlnet_plabel_tune_exp1.ipynb
 riboclette/models/xlnet/pseudolabeling/xlnet_plabel_tune_exp1.py 
 riboclette/models/xlnet/pseudolabeling/xlnet_plabel_tune_exp2.ipynb
