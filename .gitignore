@@ -1,5 +1,8 @@
 data
+checkpoints
+pip_readme.md
 
+riboclette/models/data_allOld
 riboclette/models/bilstm/dh/__pycache__
 riboclette/models/bilstm/dh/*.sh
 riboclette/models/bilstm/dh/saved_models
@@ -7,12 +10,7 @@ riboclette/models/bilstm/dh/wandb
 riboclette/models/bilstm/dh/bilstm_dh_h5.ipynb 
 riboclette/models/bilstm/dh/bilstm_dh_tune.ipynb
 
-riboclette/models/bilstm/csh/__pycache__
-riboclette/models/bilstm/csh/*.sh
-riboclette/models/bilstm/csh/saved_models
-riboclette/models/bilstm/csh/wandb 
-riboclette/models/bilstm/csh/bilstm_csh_h5.ipynb 
-riboclette/models/bilstm/csh/bilstm_csh_tune.ipynb
+riboclette/models/bilstm/csh/
 
 riboclette/models/rnn 
 riboclette/models/wavenet
@@ -28,41 +26,32 @@ riboclette/models/xlnet/dh/wandb
 riboclette/models/xlnet/dh/xlnet_dh_h5.ipynb
 riboclette/models/xlnet/dh/xlnet_dh_tune.ipynb
 
-riboclette/models/xlnet/csh/saved_models
-riboclette/models/xlnet/csh/wandb
-riboclette/models/xlnet/csh/xlnet_csh_h5.ipynb
-riboclette/models/xlnet/csh/xlnet_csh_tune.ipynb
-
+riboclette/models/xlnet/csh/
 riboclette/models/xlnet/func
 riboclette/models/preds_h5s
 
 riboclette/models/xlnet/interpretability/
 
-riboclette/models/xlnet/pseudolabeling/__pycache__
-riboclette/models/xlnet/pseudolabeling/codon_optimization
-riboclette/models/xlnet/pseudolabeling/job_scripts 
-riboclette/models/xlnet/pseudolabeling/check_results_h5.ipynb
-riboclette/models/xlnet/pseudolabeling/model_outputs 
-riboclette/models/xlnet/pseudolabeling/xlnet_plabel_h5.ipynb
-riboclette/models/xlnet/pseudolabeling/check_attr_preds.ipynb
-riboclette/models/xlnet/pseudolabeling/xlnet_plabel_plots.ipynb
-riboclette/models/xlnet/pseudolabeling/plots_utils.py
-riboclette/models/xlnet/pseudolabeling/interpret
-riboclette/models/xlnet/pseudolabeling/preds 
-riboclette/models/xlnet/pseudolabeling/saved_models
-riboclette/models/xlnet/pseudolabeling/wandb
-riboclette/models/xlnet/pseudolabeling/plots
-riboclette/models/xlnet/pseudolabeling/interpret_plabel_batch_extra.ipynb 
-riboclette/models/xlnet/pseudolabeling/xlnet_plabel_tune_exp1.ipynb
-riboclette/models/xlnet/pseudolabeling/xlnet_plabel_tune_exp1.py 
-riboclette/models/xlnet/pseudolabeling/xlnet_plabel_tune_exp2.ipynb
-riboclette/models/xlnet/pseudolabeling/xlnet_plabel_tune_exp2.py
-riboclette/models/xlnet/pseudolabeling/interpret_plabel.ipynb
-
-riboclette/preprocessing/df_reps_sims 
-riboclette/preprocessing/instadeep.py 
-riboclette/preprocessing/run_reps.sh
-
+riboclette/models/xlnet/plabel/__pycache__
+riboclette/models/xlnet/plabel/codon_optimization
+riboclette/models/xlnet/plabel/job_scripts 
+riboclette/models/xlnet/plabel/check_results_h5.ipynb
+riboclette/models/xlnet/plabel/model_outputs 
+riboclette/models/xlnet/plabel/xlnet_plabel_h5.ipynb
+riboclette/models/xlnet/plabel/check_attr_preds.ipynb
+riboclette/models/xlnet/plabel/xlnet_plabel_plots.ipynb
+riboclette/models/xlnet/plabel/plots_utils.py
+riboclette/models/xlnet/plabel/interpret
+riboclette/models/xlnet/plabel/preds 
+riboclette/models/xlnet/plabel/saved_models
+riboclette/models/xlnet/plabel/wandb
+riboclette/models/xlnet/plabel/plots
+riboclette/models/xlnet/plabel/interpret_plabel_batch_extra.ipynb 
+riboclette/models/xlnet/plabel/xlnet_plabel_tune_exp1.ipynb
+riboclette/models/xlnet/plabel/xlnet_plabel_tune_exp1.py 
+riboclette/models/xlnet/plabel/xlnet_plabel_tune_exp2.ipynb
+riboclette/models/xlnet/plabel/xlnet_plabel_tune_exp2.py
+riboclette/models/xlnet/plabel/interpret_plabel.ipynb
 riboclette/models/xlnet/wandb 
 
 riboclette/models/ribomimo

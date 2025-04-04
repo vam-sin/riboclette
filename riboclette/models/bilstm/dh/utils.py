@@ -31,9 +31,9 @@ def RiboDatasetGWSDepr():
     '''
     Dataset generation function
     '''
-    train_path = here('riboclette/data/orig', 'train.csv')
-    val_path = here('riboclette/data/orig', 'val.csv')
-    test_path = here('riboclette/data/orig', 'test.csv')
+    train_path = here('data', 'orig', 'train.csv')
+    val_path = here('data', 'orig', 'val.csv')
+    test_path = here('data', 'orig', 'test.csv')
 
     df_train = pd.read_csv(train_path)
     df_val = pd.read_csv(val_path)

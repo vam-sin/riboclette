@@ -14,8 +14,8 @@ CM_TO_INCH = 1 / 2.54
 TEXTWIDTH_INCH = TEXTWIDTH_CM * CM_TO_INCH
 
 # File paths
-GENCODE_FPATH = here("data", "data", "genetic_code.csv")
-ENSEMBL_FPATH = here("data", "data", "ensembl.cds.fa")
+GENCODE_FPATH = here("data", "genetic_code.csv")
+ENSEMBL_FPATH = here("data", "ensembl.cds.fa")
 
 # File names
 ATTR_FNAMES = [

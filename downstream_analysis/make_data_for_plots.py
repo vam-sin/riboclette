@@ -304,13 +304,13 @@ def run_topk_attr_condition_wise(
 
     # Load genetic code
     genetic_code = pd.read_csv(
-        here("data", "data", "genetic_code.csv"), index_col=0
+        here("data", "genetic_code.csv"), index_col=0
     ).set_index("Codon")
     genetic_code.head()
 
     # Load gene to seq dataframe
     df_trans_to_seq = []
-    with open(here("data", "data", "ensembl.cds.fa"), mode="r") as handle:
+    with open(here("data", "ensembl.cds.fa"), mode="r") as handle:
         for record in SeqIO.parse(handle, "fasta"):
             df_trans_to_seq.append(
                 [
