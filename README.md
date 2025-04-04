@@ -16,11 +16,11 @@ pip install riboclette
 
 ---
 
-### Web Server 🌐🧬
+## Web Server 🌐🧬
 
 We provide a web-based server where you can explore codon-level attributions for different genes in the dataset. This server allows you to visualize and analyze the model's predictions and interpretability results interactively.
 
-#### Access the server here: [Riboclette Codon-Level Analysis Server](https://lts2.epfl.ch/ribotly/)
+#### Access the server here: [Ribotly](https://lts2.epfl.ch/ribotly/)
 
 On the server, you can:
 - Select genes of interest from the dataset.
