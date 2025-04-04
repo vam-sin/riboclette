@@ -13,6 +13,7 @@ from torch.utils.data import Dataset
 from transformers import Trainer
 import itertools
 from tqdm import tqdm
+from pyhere import here
 
 # %%
 # model functions
@@ -160,9 +161,9 @@ def compute_metrics_saved(pred):
     preds = preds.cpu().numpy()
     labels = labels.cpu().numpy()
 
-    np.save("preds/preds.npy", preds)
-    np.save("preds/labels.npy", labels)
-    np.save("preds/inputs.npy", inputs)
+    # np.save("preds/preds.npy", preds)
+    # np.save("preds/labels.npy", labels)
+    # np.save("preds/inputs.npy", inputs)
 
     return {"r": corr_coef.compute(), "mae": mae_coef.compute(), "mape": mape_coef.compute()}
 
@@ -185,13 +186,15 @@ def slidingWindowZeroToNan(a, window_size=30):
 
 def RiboDatasetPlabel():
     # load training and testing original sets
-    plabel_train_path = '../../../data/plabel/plabel_train.csv'
-    df_test_orig = pd.read_csv('../../../data/orig/test.csv')
-    df_val_orig = pd.read_csv('../../../data/orig/val.csv')
+    train_path = here('riboclette/data/plabel', 'plabel_train.csv')
+    val_path = here('riboclette/data/orig', 'val.csv')
+    test_path = here('riboclette/data/orig', 'test.csv')
 
-    df_train_plabel = pd.read_csv(plabel_train_path)
+    df_train = pd.read_csv(train_path)
+    df_val = pd.read_csv(val_path)
+    df_test = pd.read_csv(test_path)
 
-    return df_train_plabel, df_val_orig, df_test_orig
+    return df_train, df_val, df_test
 
 class GWSDatasetFromPandas(Dataset):
     def __init__(self, df):

@@ -11,6 +11,7 @@ import os
 import lightning as L
 from scipy import sparse
 from torch.autograd import Variable
+from pyhere import here
 
 id_to_codon = {idx:''.join(el) for idx, el in enumerate(itertools.product(['A', 'T', 'C', 'G'], repeat=3))}
 codon_to_id = {v:k for k,v in id_to_codon.items()}
@@ -30,11 +31,13 @@ def RiboDatasetGWSDepr():
     '''
     Dataset generation function
     '''
-    dataset_folder = '../../../data/orig/'
+    train_path = here('riboclette/data/orig', 'train.csv')
+    val_path = here('riboclette/data/orig', 'val.csv')
+    test_path = here('riboclette/data/orig', 'test.csv')
 
-    df_train = pd.read_csv(dataset_folder + 'train.csv')
-    df_val = pd.read_csv(dataset_folder + 'val.csv')
-    df_test = pd.read_csv(dataset_folder + 'test.csv')
+    df_train = pd.read_csv(train_path)
+    df_val = pd.read_csv(val_path)
+    df_test = pd.read_csv(test_path)
 
     return df_train, df_val, df_test
 
