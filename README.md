@@ -1,4 +1,4 @@
-# 🧬🧑‍💻 Riboclette: Conditional Deep Learning Model Reveals Translation Elongation Determinants during Amino Acid Deprivation
+# 🧬🧑🏾‍💻 Riboclette: Conditional Deep Learning Model Reveals Translation Elongation Determinants during Amino Acid Deprivation
 
 Welcome to **Riboclette**, a transformer-based deep learning model for predicting ribosome densities under various nutrient-deprivation conditions. Follow this tutorial to get started! 🚀
 
@@ -13,6 +13,19 @@ Riboclette can be easily installed as a package using which you can make predict
 ```bash
 pip install riboclette
 ```
+
+---
+
+### Web Server 🌐🧬
+
+We provide a web-based server where you can explore codon-level attributions for different genes in the dataset. This server allows you to visualize and analyze the model's predictions and interpretability results interactively.
+
+#### Access the server here: [Riboclette Codon-Level Analysis Server](https://lts2.epfl.ch/ribotly/)
+
+On the server, you can:
+- Select genes of interest from the dataset.
+- View codon-level attributions for each gene.
+- Analyze how nutrient-deprivation conditions affect ribosome densities at a single codon resolution.
 
 ---
 
